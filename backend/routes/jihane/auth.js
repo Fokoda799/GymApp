@@ -12,6 +12,8 @@ const router = express.Router();
 // --- Middleware ---
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers['authorization'];
+  console.log("authHeader")
+  console.log(authHeader)
   if (!authHeader)
     return res.status(401).json({ success: false, message: 'Token manquant.' });
 
@@ -102,8 +104,8 @@ router.post('/register', async (req, res) => {
       `INSERT INTO Clients (name, email, password, image, birth, weight, height, frequency, goal, weightGoal, gender, coachID, createdAt)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
       [name, email, hashedPassword, image || null, birth || null, weight || null,
-       height || null, frequency || null, goal || null, weightGoal || null,
-       gender || 'Male', coachID || null]
+        height || null, frequency || null, goal || null, weightGoal || null,
+        gender || 'Male', coachID || null]
     );
 
     const token = jwt.sign(
@@ -301,5 +303,75 @@ function htmlResetForm(token, action) {
     </html>
   `;
 }
+
+// POST /api/jihane/auth/create-coach
+router.post('/create-coach', async (req, res) => {
+  const {
+    name,
+    email,
+    password,
+    image,
+    specialty,
+    bio
+  } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Name, email and password are required.'
+    });
+  }
+
+  try {
+    // Vérifier si email existe déjà
+    const [existing] = await db.query(
+      'SELECT id FROM Coaches WHERE email = ?',
+      [email]
+    );
+
+    if (existing.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists.'
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert coach
+    const [result] = await db.query(
+      `INSERT INTO Coaches
+      (name, email, password, image, specialty, bio, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+      [
+        name,
+        email,
+        hashedPassword,
+        image || null,
+        specialty || null,
+        bio || null
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      coach: {
+        id: result.insertId,
+        name,
+        email
+      },
+      message: 'Coach created successfully.'
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: 'Server error.'
+    });
+  }
+});
 
 export { router as default, authMiddleware };

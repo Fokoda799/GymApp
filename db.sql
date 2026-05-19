@@ -34,7 +34,7 @@ CREATE TABLE Clients (
     name VARCHAR(255),
     image VARCHAR(255),
     birth DATE,
-    gender VARCHAR(255) NOT NULL DEFAULT 'Male',
+    gender VARCHAR(10) NOT NULL DEFAULT 'Male',
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     weight DOUBLE,
@@ -44,7 +44,6 @@ CREATE TABLE Clients (
     weightGoal DOUBLE,
     createdAt DATE,
     coachID INT,
-    gender VARCHAR(10) NOT NULL DEFAULT 'Male',
     passwordHash VARCHAR(255) NOT NULL DEFAULT '',
     FOREIGN KEY (coachID) REFERENCES Coaches(id)
 );
