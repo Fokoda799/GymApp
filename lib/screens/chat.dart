@@ -2,15 +2,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/models/message.dart';
+import 'package:test_hh/screens/voice.dart';
 import 'package:test_hh/services/chatapi_service.dart';
 
-/// Données de session passées à l'écran.
 class ChatSession {
   final int coachId;
   final String coachName;
   final String coachInitials;
   final int clientId;
-  final String clientName;
+  final String? clientImage;
+  final String? clientName;
   final String clientInitials;
   final String role; // 'client' | 'coach'
 
@@ -19,6 +20,7 @@ class ChatSession {
     required this.coachName,
     required this.coachInitials,
     required this.clientId,
+    required this.clientImage,
     required this.role,
     this.clientName = 'Client',
     this.clientInitials = 'C',
@@ -238,19 +240,31 @@ class _ChatScreenState extends State<ChatScreen> {
                   width: 1.5,
                 ),
               ),
-              child: Center(
-                child: Text(
-                  _s.role == 'coach' ? _s.clientInitials : _s.coachInitials,
-                  style: const TextStyle(
-                    color: kNeonGreen,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              child: _s.role == 'coach' && _s.clientImage != null && _s.clientImage!.isNotEmpty
+                  ? ClipOval(
+                      child: Image.network(
+                        _s.clientImage!,
+                        width: 28,
+                        height: 28,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        _s.role == 'coach'
+                            ? _s.clientInitials
+                            : _s.coachInitials,
+                        style: const TextStyle(
+                          color: kNeonGreen,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
             ),
             const SizedBox(width: 10),
             Text(
-              _s.role == 'coach' ? _s.clientName : _s.coachName,
+              _s.role == 'coach' ? (_s.clientName ?? "") : _s.coachName,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -258,6 +272,26 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
+        actions: [
+          Container(
+            margin: EdgeInsets.only(right: 14),
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => VoiceScreen(chatSession: _s)
+                  )
+                );
+              },
+              icon: Icon(
+                Icons.call,
+                color: kNeonGreen,
+                size: 30,
+              ),
+            ),
+          )
+        ],
       ),
       body: Stack(
         children: [
@@ -343,16 +377,27 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: kNeonGreen.withOpacity(0.12),
                 border: Border.all(color: kNeonGreen.withOpacity(0.35)),
               ),
-              child: Center(
-                child: Text(
-                  _s.role == 'coach' ? _s.clientInitials : _s.coachInitials,
-                  style: const TextStyle(
-                    color: kNeonGreen,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
+              child: _s.role == "coach" && _s.clientImage != null && _s.clientImage!.isNotEmpty
+                  ? ClipOval(
+                      child: Image.network(
+                        _s.clientImage!,
+                        width: 28,
+                        height: 28,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        _s.role == 'coach'
+                            ? _s.clientInitials
+                            : _s.coachInitials,
+                        style: const TextStyle(
+                          color: kNeonGreen,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
             ),
             const SizedBox(width: 8),
           ],

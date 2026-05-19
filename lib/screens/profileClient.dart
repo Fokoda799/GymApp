@@ -406,6 +406,24 @@ class _ProfileClientState extends State<ProfileClient> {
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
         children: [
+                GestureDetector(
+                  onTap: () => Navigator.maybePop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 12),
           if (widget.clientId != null) ...[
             GestureDetector(
               onTap: () => Navigator.pop(context),
@@ -1102,10 +1120,9 @@ class _ProfileClientState extends State<ProfileClient> {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.pushAndRemoveUntil(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const CoachesPage()),
-                  (route) => false,
                 );
               },
               child: Text("Search coach", style: TextStyle(color: Colors.lightGreenAccent)),

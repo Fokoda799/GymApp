@@ -35,6 +35,8 @@ class ChatApiService {
       Uri.parse('$_baseUrl/conversations'),
       headers: await _headers(),
     );
+    print("conversations :");
+    print(response.body);
     _checkStatus(response);
     final data = jsonDecode(response.body);
     return List<Map<String, dynamic>>.from(data['conversations']);

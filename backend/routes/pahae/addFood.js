@@ -339,4 +339,95 @@ router.post("/recipes", async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// GET /api/pahae/addFood/fooder
+// Peuple la table Ingredients depuis Open Food Facts API
+// ─────────────────────────────────────────────────────────────────────────────
+router.get("/fooder", async (req, res) => {
+  const PAGE_SIZE = 100;
+  const TOTAL_PAGES = 5; // 500 produits au total, ajustable
+
+  // Détermine le type selon les catégories du produit
+  const resolveType = (product) => {
+    const tags = (product.categories_tags ?? []).join(" ");
+    const name = (product.product_name ?? "").toLowerCase();
+    if (
+      tags.includes("beverages") ||
+      tags.includes("drinks") ||
+      tags.includes("juices") ||
+      tags.includes("waters") ||
+      name.includes("juice") ||
+      name.includes("water") ||
+      name.includes("milk") ||
+      name.includes("drink")
+    ) {
+      return "liquid";
+    }
+    return "solid";
+  };
+
+  try {
+    let inserted = 0;
+    let skipped = 0;
+
+    for (let page = 1; page <= TOTAL_PAGES; page++) {
+      const url =
+        `https://world.openfoodfacts.org/cgi/search.pl` +
+        `?action=process&json=true&page_size=${PAGE_SIZE}&page=${page}` +
+        `&fields=product_name,image_front_url,nutriments,categories_tags` +
+        `&sort_by=unique_scans_n`; // les plus scannés = les plus connus
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.warn(`Page ${page} failed: HTTP ${response.status}`);
+        continue;
+      }
+
+      const json = await response.json();
+      const products = json.products ?? [];
+
+      for (const product of products) {
+        const name = product.product_name?.trim();
+        const image = product.image_front_url ?? "";
+        const calories = Math.round(
+          product.nutriments?.["energy-kcal_100g"] ??
+          (product.nutriments?.["energy_100g"] ?? 0) / 4.184
+        );
+        const type = resolveType(product);
+
+        // Ignore les entrées sans nom ou calories aberrantes
+        if (!name || name.length < 2 || calories < 0 || calories > 9000) {
+          skipped++;
+          continue;
+        }
+
+        // INSERT IGNORE évite les doublons si on relance l'endpoint
+        await pool.query(
+          `INSERT IGNORE INTO Ingredients (name, image, calories, type)
+           SELECT ?, ?, ?, ?
+           FROM DUAL
+           WHERE NOT EXISTS (
+             SELECT 1 FROM Ingredients WHERE name = ?
+           )`,
+          [name, image, calories, type, name]
+        );
+        inserted++;
+      }
+
+      // Petite pause pour ne pas surcharger l'API externe
+      await new Promise((r) => setTimeout(r, 300));
+    }
+
+    res.json({
+      success: true,
+      message: `Seeding terminé`,
+      inserted,
+      skipped,
+    });
+  } catch (err) {
+    console.error("GET /fooder:", err.message);
+    res.status(500).json({ success: false, message: "Échec du seeding des ingrédients" });
+  }
+});
+
 export default router;

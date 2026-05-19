@@ -115,9 +115,14 @@ class _HeaderState extends State<Header> {
 
     final user = data['user'] ?? data['client'] as Map<String, dynamic>?;
     final clientId = user?['id'] as int?;
+    final clientImage = user?['image'] as String?;
+    final clientName = user?['name'] as String?;
     final coach = user?['coach'] as Map<String, dynamic>?;
     final coachId = coach?['id'] as int?;
     final coachName = (coach?['name'] as String?) ?? 'Mon Coach';
+
+    print("clientName :");
+    print(clientName);
 
     if (clientId == null || coachId == null) {
       _showSnack('Aucun coach assigné à votre compte.');
@@ -134,6 +139,8 @@ class _HeaderState extends State<Header> {
             coachName: coachName,
             coachInitials: _initials(coachName),
             clientId: clientId,
+            clientImage: clientImage,
+            clientName: clientName,
             role: 'client',
           ),
         ),

@@ -11,7 +11,7 @@ import 'package:test_hh/screens/profileClient.dart';
 import 'package:test_hh/screens/register.dart';
 import 'package:test_hh/screens/welcome.dart';
 import 'package:test_hh/screens/program.dart';
-import 'package:test_hh/session/user_session.dart'; 
+import 'package:test_hh/session/user_session.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
