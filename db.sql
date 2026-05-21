@@ -197,7 +197,7 @@ CREATE TABLE RecipesDay (
 -- ======================
 -- TABLE: Messages
 -- ======================
-CREATE TABLE `messages` (
+CREATE TABLE `Messages` (
   `id` int(11) NOT NULL,
   `text` text,
   `time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:test_hh/constants/colors.dart';
-import 'package:test_hh/screens/home.dart';
+import 'package:test_hh/screens/login.dart';
 import 'package:test_hh/services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -264,7 +264,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
       } else {
         _showErrorSnackbar(response['message'] ?? 'Registration failed.');

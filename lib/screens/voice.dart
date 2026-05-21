@@ -5,6 +5,7 @@ import 'package:universal_html/html.dart' as html;
 import 'dart:ui_web' as ui;
 
 import 'package:test_hh/screens/chat.dart';
+import 'package:test_hh/constants/urls.dart';
 
 class VoiceScreen extends StatefulWidget {
   final ChatSession chatSession;
@@ -47,7 +48,7 @@ class _VoiceScreenState extends State<VoiceScreen> {
     final image = s.clientImage ?? '';
 
     final _url =
-        'http://localhost:5000'
+        '$kBaseUrl'
         '?roomID=$roomID'
         '&userID=$userID'
         '&username=${Uri.encodeComponent(username ?? "Unknown")}'

@@ -13,6 +13,7 @@ import homeRoutes from './routes/pahae/home.js';
 import addFoodRoutes from './routes/pahae/addFood.js';
 import addRecipeRoutes from './routes/pahae/addRecipe.js';
 import clientsRoutes from './routes/pahae/clients.js';
+import runnerRoutes from './routes/pahae/runner.js';
 
 import authRoutes from './routes/jihane/auth.js';
 import clientRoutes from './routes/jihane/client.js';
@@ -32,6 +33,7 @@ app.use('/api/pahae/home/', homeRoutes);
 app.use('/api/pahae/addFood/', addFoodRoutes);
 app.use('/api/pahae/addRecipe/', addRecipeRoutes);
 app.use('/api/pahae/clients/', clientsRoutes);
+app.use('/api/pahae/runner/', runnerRoutes);
 
 app.use("/api/client", clientRoute);
 app.use("/api/exercice", exerciceRoute);
@@ -189,6 +191,7 @@ function findSocketIdByUserId(userId) {
     return null;
 }
 
-server.listen(5000, "0.0.0.0", () => {
-    console.log("Server running on port 5000");
+const PORT = process.env.PORT 
+server.listen(PORT, "0.0.0.0", () => {
+    console.log("Server running on port " + PORT);
 });
