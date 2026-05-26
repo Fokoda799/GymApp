@@ -16,6 +16,10 @@ It includes:
 
 👉 https://gymfuel-landing.vercel.app
 
+## ✔ Admin Management Plateform
+
+👉 https://gymfuel-admin.vercel.app
+
 ---
 
 ## 🚀 Features
