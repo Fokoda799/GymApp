@@ -3,7 +3,6 @@ import pool from "../../config/db.js";
 
 const router = express.Router();
 
-// DB column is "image", Flutter model expects "imageUrl"
 const mapIngredient = (row) => ({
   id: String(row.id),
   name: row.name ?? "",
@@ -13,8 +12,7 @@ const mapIngredient = (row) => ({
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GET /api/pahae/addFood/ingredients
-// ─────────────────────────────────────────────────────────────────────────────
+
 router.get("/ingredients", async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -28,8 +26,7 @@ router.get("/ingredients", async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GET /api/pahae/addFood/recent/:clientID
-// ─────────────────────────────────────────────────────────────────────────────
+
 router.get("/recent/:clientID", async (req, res) => {
   const { clientID } = req.params;
   if (!clientID || isNaN(clientID)) {
@@ -61,8 +58,7 @@ router.get("/recent/:clientID", async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GET /api/pahae/addFood/recipes/:clientID
-// ─────────────────────────────────────────────────────────────────────────────
+
 router.get("/recipes/:clientID", async (req, res) => {
   const { clientID } = req.params;
   if (!clientID || isNaN(clientID)) {
@@ -111,9 +107,7 @@ router.get("/recipes/:clientID", async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// POST /api/pahae/addFood/log
-// Body: { clientID, mealtime, items: [{ type, id, quantity }] }
-// ─────────────────────────────────────────────────────────────────────────────
+
 router.post("/log", async (req, res) => {
   const { clientID, mealtime, items } = req.body;
 
@@ -262,9 +256,7 @@ router.post("/log", async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// POST /api/pahae/addFood/recipes
-// Body: { clientID, name, image, calories, ingredientIDs: [1,2,3] }
-// ─────────────────────────────────────────────────────────────────────────────
+
 router.post("/recipes", async (req, res) => {
   const { clientID, name, image, calories, ingredientIDs } = req.body;
 

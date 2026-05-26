@@ -6,7 +6,6 @@ import 'package:test_hh/screens/register.dart';
 
 const _imgHero = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=85';
 
-
 void _goLogin(BuildContext context) {
   Navigator.of(context).push(
     PageRouteBuilder(
@@ -180,14 +179,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         fit: StackFit.expand,
         children: [
           Positioned.fill(
-            child: Image.network(
-              _imgHero,
-              fit: BoxFit.cover,
-              loadingBuilder: (_, child, prog) =>
-                  prog == null ? child : const SizedBox.shrink(),
-              errorBuilder: (_, __, ___) =>
-                  Container(color: const Color(0xFF0D1A0D)),
-            ),
+            child: Image.asset('assets/welcome.png', fit: BoxFit.cover),
           ),
 
           Positioned.fill(
@@ -233,11 +225,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: kGreen,
-                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50),
                         ),
-                        child: const Icon(Icons.bolt_rounded,
-                            color: Colors.black, size: 22),
+                        child: Image.asset('assets/logo.png', fit: BoxFit.cover),
                       ),
                       const SizedBox(width: 10),
                       Text(

@@ -3,10 +3,8 @@ import pool from "../../config/db.js";
 
 const router = express.Router();
 
-// ─────────────────────────────────────────────
-// GET /api/pahae/clients/coach/:coachID
-// Returns all clients assigned to a coach
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+
 router.get("/coach/:coachID", async (req, res) => {
   const { coachID } = req.params;
 
@@ -43,11 +41,8 @@ router.get("/coach/:coachID", async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// DELETE /api/pahae/clients/:clientID/coach/:coachID
-// Removes the coach from a client (sets coachID to NULL)
-// Does NOT delete the client account
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+
 router.delete("/:clientID/coach/:coachID", async (req, res) => {
   const { clientID, coachID } = req.params;
 
@@ -56,7 +51,6 @@ router.delete("/:clientID/coach/:coachID", async (req, res) => {
   }
 
   try {
-    // Verify the client actually belongs to this coach before removing
     const [check] = await pool.query(
       `SELECT id FROM Clients WHERE id = ? AND coachID = ?`,
       [clientID, coachID]

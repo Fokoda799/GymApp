@@ -3,10 +3,8 @@ import pool from "../../config/db.js";
 
 const router = express.Router();
 
-// ─────────────────────────────────────────────────────────────────
-// GET /api/pahae/addRecipe/ingredients
-// Returns all available ingredients from the catalogue
-// ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+
 router.get("/ingredients", async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -19,40 +17,17 @@ router.get("/ingredients", async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────
-// POST /api/pahae/addRecipe/save
-// Creates a new recipe and links its ingredients
-//
-// Body:
-// {
-//   clientID: 1,          ← example value
-//   name: "My Recipe",
-//   image: "https://...", ← optional URL string (from picked image or first ingredient)
-//   calories: 532,        ← total computed on client
-//   ingredients: [
-//     { ingredientID: 1, quantity: 100 },
-//     { ingredientID: 3, quantity: 200 },
-//     ...
-//   ]
-// }
-//
-// Note: RecipeIngredients (the join table linking a recipe to its
-// specific ingredients + quantities) is not part of the current
-// schema, so we insert into NutritionIngredients with mealtime
-// set to "recipe" as a convention, and we store the recipe row
-// in Recipes. Extend the schema later if a dedicated
-// RecipeIngredients table is added.
-// ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+
 router.post("/save", async (req, res) => {
   const {
-    clientID = 1,       // example default
+    clientID = 1,
     name,
     image = null,
     calories,
-    ingredients = [],   // [{ ingredientID, quantity }]
+    ingredients = [],
   } = req.body;
 
-  // ── Basic validation ──────────────────────────────────────────
   if (!name || typeof name !== "string" || name.trim() === "") {
     return res.status(400).json({ success: false, message: "Recipe name is required." });
   }
@@ -72,18 +47,12 @@ router.post("/save", async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    // 1. Insert the recipe row
     await connection.query(
       "INSERT INTO Recipes (name, image, calories, clientID) VALUES (?, ?, ?, ?)",
       [name.trim(), image, Math.round(calories ?? 0), clientID]
     );
 
-    // 2. Link each ingredient via NutritionIngredients
-    //    mealtime = 'recipe' is a conventional marker so these rows are
-    //    distinguishable from real meal-plan rows.
     for (const ing of ingredients) {
-      // Upsert: if the same ingredient already exists for this client/mealtime,
-      // update quantity rather than crash on duplicate primary key.
       await connection.query(
         `INSERT INTO NutritionIngredients (ingredientID, clientID, mealtime, quantity)
          VALUES (?, ?, 'recipe', ?)
@@ -103,10 +72,8 @@ router.post("/save", async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────
-// GET /api/pahae/addRecipe/recipes/:clientID
-// Returns all recipes belonging to a client (for later use / validation)
-// ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+
 router.get("/recipes/:clientID", async (req, res) => {
   const { clientID } = req.params;
   if (!clientID || isNaN(Number(clientID))) {
