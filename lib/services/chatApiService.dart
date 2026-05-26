@@ -35,6 +35,8 @@ class ChatApiService {
       Uri.parse('$_baseUrl/conversations'),
       headers: await _headers(),
     );
+    print("conversations :");
+    print(response.body);
     _checkStatus(response);
     final data = jsonDecode(response.body);
     return List<Map<String, dynamic>>.from(data['conversations']);
@@ -100,26 +102,6 @@ class ChatApiService {
       headers: await _headers(),
     );
     _checkStatus(response);
-  }
-
-  // Initier un appel
-  static Future<Map<String, dynamic>> startCall({
-    required int coachId,
-    required int clientId,
-    required String callType,
-  }) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/calls'),
-      headers: await _headers(),
-      body: jsonEncode({
-        'coachId': coachId,
-        'clientId': clientId,
-        'callType': callType,
-      }),
-    );
-    _checkStatus(response);
-    final data = jsonDecode(response.body);
-    return Map<String, dynamic>.from(data['call']);
   }
 
   // Mettre à jour le statut d'un appel

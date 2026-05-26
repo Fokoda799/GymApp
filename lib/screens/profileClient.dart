@@ -7,10 +7,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/models/client.dart';
-import 'package:test_hh/models/coach.dart';
 import 'package:test_hh/screens/coaches.dart';
 import 'package:test_hh/screens/login.dart';
-import 'package:test_hh/services/api_service.dart';
+import 'package:test_hh/services/apiService.dart';
 import 'package:test_hh/session/user_session.dart';
 
 class ProfileClient extends StatefulWidget {
@@ -93,7 +92,6 @@ class _ProfileClientState extends State<ProfileClient> {
     super.dispose();
   }
 
-  // --- Chargement du client ---
   Future<void> _loadClient() async {
   setState(() { _isLoading = true; _error = null; });
 
@@ -104,7 +102,6 @@ class _ProfileClientState extends State<ProfileClient> {
       return;
     }
 
-    // ✅ Toujours appeler l'API pour avoir le coach inclus
     final int idToLoad = widget.clientId ?? UserSession.instance.id;
     final res = await ApiService.getClient(idToLoad);
 
@@ -113,7 +110,6 @@ class _ProfileClientState extends State<ProfileClient> {
     if (res['success'] == true && res['client'] != null) {
       _applyClient(Client.fromJson(res['client'] as Map<String, dynamic>));
     } else {
-      // Fallback seulement si l'API échoue
       _applyClientFromSession();
     }
   } catch (e) {
@@ -158,7 +154,6 @@ class _ProfileClientState extends State<ProfileClient> {
     });
   }
 
-  // --- Upload vers Cloudinary ---
   Future<String?> _uploadImageToCloudinary(XFile imageFile) async {
     try {
       final uri = Uri.parse("https://api.cloudinary.com/v1_1/dlqcknocf/image/upload");
@@ -192,7 +187,6 @@ class _ProfileClientState extends State<ProfileClient> {
     }
   }
 
-  // --- Sélection d'image ---
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -201,7 +195,6 @@ class _ProfileClientState extends State<ProfileClient> {
     }
   }
 
-  // --- Sauvegarde du profil ---
   Future<void> _saveClient() async {
     if (_client == null) return;
     _commitMetrics();
@@ -257,7 +250,6 @@ class _ProfileClientState extends State<ProfileClient> {
     }
   }
 
-  // --- Autres méthodes utilitaires ---
   String _formattedDate(DateTime? d) {
     if (d == null) return '—';
     return '${d.day.toString().padLeft(2, '0')} / ${d.month.toString().padLeft(2, '0')} / ${d.year}';
@@ -324,7 +316,6 @@ class _ProfileClientState extends State<ProfileClient> {
     }
   }
 
-  // --- UI ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -406,6 +397,24 @@ class _ProfileClientState extends State<ProfileClient> {
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
         children: [
+                GestureDetector(
+                  onTap: () => Navigator.maybePop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 12),
           if (widget.clientId != null) ...[
             GestureDetector(
               onTap: () => Navigator.pop(context),
@@ -1102,10 +1111,9 @@ class _ProfileClientState extends State<ProfileClient> {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.pushAndRemoveUntil(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const CoachesPage()),
-                  (route) => false,
                 );
               },
               child: Text("Search coach", style: TextStyle(color: Colors.lightGreenAccent)),

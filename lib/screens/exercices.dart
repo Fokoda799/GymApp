@@ -2,12 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/screens/exercice.dart';
 import 'package:test_hh/constants/urls.dart';
-
-// ─── Models ───────────────────────────────────────────────────────────────────
 
 class NoteModel {
   final String id;
@@ -81,11 +78,9 @@ class BodyPartModel {
       );
 }
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
-
 class ExercicesScreen extends StatefulWidget {
-  final String bodyPartID; // on passe juste l'ID, on fetch le reste
-  final String bodyPartName; // pour afficher pendant le loading
+  final String bodyPartID;
+  final String bodyPartName;
 
   const ExercicesScreen({
     super.key,
@@ -101,8 +96,6 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String? _expandedId;
-
-  // ── State API ─────────────────────────────────────────────────────────────
   BodyPartModel? _bodyPart;
   bool _loading = true;
   String? _error;
@@ -121,8 +114,6 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
     _searchController.dispose();
     super.dispose();
   }
-
-  // ── API ───────────────────────────────────────────────────────────────────
 
   Future<void> _fetchBodyPart() async {
     setState(() { _loading = true; _error = null; });
@@ -149,16 +140,12 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
     }
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
-
   List<ExerciceModel> get _filtered {
     if (_bodyPart == null) return [];
     return _bodyPart!.exercices
         .where((e) => e.name.toLowerCase().contains(_searchQuery))
         .toList();
   }
-
-  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -220,8 +207,6 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
           );
   }
 
-  // ─── TOP BAR ──────────────────────────────────────────────────────────────
-
   Widget _buildTopBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
@@ -272,8 +257,6 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
     );
   }
 
-  // ─── SEARCH BAR ───────────────────────────────────────────────────────────
-
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
@@ -307,8 +290,6 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
     );
   }
 
-  // ─── EXERCISE CARD ────────────────────────────────────────────────────────
-
   Widget _buildExerciceCard(ExerciceModel ex) {
     final isExpanded = _expandedId == ex.id;
     return Container(
@@ -324,7 +305,6 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
       clipBehavior: Clip.hardEdge,
       child: Column(
         children: [
-          // ── Header row ──
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -413,7 +393,6 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
             ),
           ),
 
-          // ── Expandable notes ──
           AnimatedSize(
             duration: const Duration(milliseconds: 260),
             curve: Curves.easeInOut,
@@ -473,8 +452,6 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
     );
   }
 
-  // ─── Note item ────────────────────────────────────────────────────────────
-
   Widget _buildNoteItem(int index, NoteModel note, bool isLast) {
     return Column(
       children: [
@@ -533,8 +510,6 @@ class _ExercicesScreenState extends State<ExercicesScreen> {
       ],
     );
   }
-
-  // ─── Shared ───────────────────────────────────────────────────────────────
 
   Widget _buildTypeChip(String label) {
     return Container(

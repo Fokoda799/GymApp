@@ -6,10 +6,10 @@ INSERT INTO BodyParts (name, image) VALUES
 ('Shoulders', 'shoulders.jpg'),
 ('Arms', 'arms.jpg');
 
-INSERT INTO Coaches (name, image, createdAt) VALUES
-('John Doe', 'john_doe.jpg', '2024-01-15'),
-('Jane Smith', 'jane_smith.jpg', '2024-02-20'),
-('Mike Johnson', 'mike_johnson.jpg', '2024-03-10');
+-- INSERT INTO Coaches (name, image, createdAt) VALUES
+-- ('John Doe', 'john_doe.jpg', '2024-01-15'),
+-- ('Jane Smith', 'jane_smith.jpg', '2024-02-20'),
+-- ('Mike Johnson', 'mike_johnson.jpg', '2024-03-10');
 
 INSERT INTO Clients (name, image, birth, gender, email, password, weight, height, frequency, goal, weightGoal, createdAt, coachID) VALUES
 ('Alice Brown', 'alice_brown.jpg', '1990-05-10', 'Female', 'alice@example.com', 'password123', 65.5, 170, 3, 'Lose weight', 60.0, '2024-01-20', 1),

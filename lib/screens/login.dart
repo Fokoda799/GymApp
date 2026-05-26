@@ -1,4 +1,3 @@
-// lib/screens/login.dart
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/names.dart';
@@ -6,7 +5,7 @@ import 'package:test_hh/screens/clients.dart';
 import 'package:test_hh/screens/register.dart';
 import 'package:test_hh/screens/home.dart';
 import 'package:test_hh/screens/forgotPassword.dart';
-import 'package:test_hh/services/api_service.dart';
+import 'package:test_hh/services/apiService.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -39,7 +38,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   setState(() => _isLoading = true);
 
-  // Un seul appel — le backend détecte client ou coach
   final result = await ApiService.login(
     identifier: identifier,
     password: password,
@@ -83,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          // ── Background image top ──
           Positioned(
             top: 0, left: 0, right: 0, height: 320,
             child: Stack(
@@ -104,7 +101,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // ── Neon glow blobs ──
           Positioned(
             top: -80, right: -80,
             child: Container(
@@ -130,7 +126,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // ── Main content ──
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 36),
@@ -167,7 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Forgot password
                   Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
@@ -188,8 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   _buildConnexionButton(),
                   const SizedBox(height: 18),
                   _buildOrDivider(),
-                  const SizedBox(height: 18),
-                  _buildGoogleButton(),
+                  // const SizedBox(height: 18),
+                  // _buildGoogleButton(),
                   const SizedBox(height: 20),
                   _buildSignUpRow(),
                 ],
@@ -344,7 +338,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildGoogleButton() {
     return GestureDetector(
-      onTap: () {}, // À implémenter avec google_sign_in
+      onTap: () {},
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 13),
         decoration: BoxDecoration(

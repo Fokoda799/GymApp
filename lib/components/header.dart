@@ -5,7 +5,9 @@ import 'package:test_hh/screens/profileClient.dart';
 import 'package:test_hh/screens/profileCoach.dart';
 import 'package:test_hh/screens/chat.dart';
 import 'package:test_hh/screens/coachConv.dart';
-import 'package:test_hh/services/api_service.dart';
+import 'package:test_hh/screens/ai.dart';
+import 'package:test_hh/models/chatSession.dart';
+import 'package:test_hh/services/apiService.dart';
 
 class Header extends StatefulWidget implements PreferredSizeWidget {
   const Header({super.key});
@@ -21,7 +23,8 @@ class _HeaderState extends State<Header> {
   bool _chatLoading = false;
   String? _userImageUrl;
   bool _isLoadingImage = true;
-  bool _showChatButton = false; // true si coach OU client avec coach assigné
+  bool _showChatButton = false;
+  bool _isClient = false;
 
   @override
   void initState() {
@@ -30,21 +33,24 @@ class _HeaderState extends State<Header> {
     _checkChatAvailability();
   }
 
-  // Vérifie si le bouton chat doit être affiché :
-  // - Toujours pour un coach
-  // - Seulement si un coach est assigné pour un client
   Future<void> _checkChatAvailability() async {
     try {
       final role = await ApiService.getUserRole();
       if (role == 'coach') {
-        if (mounted) setState(() => _showChatButton = true);
+        if (mounted) setState(() {
+          _showChatButton = true;
+          _isClient = false;
+        });
       } else if (role == 'client') {
         final data = await ApiService.getMe();
         if (data['success'] == true) {
           final user = data['user'] ?? data['client'];
           final coach = user?['coach'] as Map<String, dynamic>?;
           if (mounted) {
-            setState(() => _showChatButton = coach != null && coach['id'] != null);
+            setState(() {
+              _showChatButton = coach != null && coach['id'] != null;
+              _isClient = true;
+            });
           }
         }
       }
@@ -53,7 +59,6 @@ class _HeaderState extends State<Header> {
     }
   }
 
-  // Charge l'image de profil (client ou coach)
   Future<void> _loadUserImage() async {
     setState(() => _isLoadingImage = true);
     try {
@@ -82,9 +87,6 @@ class _HeaderState extends State<Header> {
     }
   }
 
-  // ══════════════════════════════════════════════════════
-  //  NAVIGATION CHAT
-  // ══════════════════════════════════════════════════════
   Future<void> _onChatTap() async {
     if (_chatLoading) return;
 
@@ -115,6 +117,8 @@ class _HeaderState extends State<Header> {
 
     final user = data['user'] ?? data['client'] as Map<String, dynamic>?;
     final clientId = user?['id'] as int?;
+    final clientImage = user?['image'] as String?;
+    final clientName = user?['name'] as String?;
     final coach = user?['coach'] as Map<String, dynamic>?;
     final coachId = coach?['id'] as int?;
     final coachName = (coach?['name'] as String?) ?? 'Mon Coach';
@@ -134,6 +138,8 @@ class _HeaderState extends State<Header> {
             coachName: coachName,
             coachInitials: _initials(coachName),
             clientId: clientId,
+            clientImage: clientImage,
+            clientName: clientName,
             role: 'client',
           ),
         ),
@@ -169,9 +175,6 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  // ══════════════════════════════════════════════════════
-  //  HELPERS
-  // ══════════════════════════════════════════════════════
   void _showSnack(String msg) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -186,9 +189,6 @@ class _HeaderState extends State<Header> {
     return parts[0][0].toUpperCase();
   }
 
-  // ══════════════════════════════════════════════════════
-  //  BUILD
-  // ══════════════════════════════════════════════════════
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -199,13 +199,17 @@ class _HeaderState extends State<Header> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Bouton chat OU placeholder pour garder le titre centré
-            if (_showChatButton)
-              _buildChatButton()
-            else
-              const SizedBox(width: 42),
+            Row(
+              children: [
+                if (_isClient) _buildAiButton(),
+                if (_isClient && _showChatButton) const SizedBox(width: 8),
+                if (_showChatButton)
+                  _buildChatButton()
+                else if (!_isClient)
+                  const SizedBox(width: 42),
+              ],
+            ),
 
-            // Titre de l'app
             RichText(
               text: TextSpan(
                 children: [
@@ -231,9 +235,42 @@ class _HeaderState extends State<Header> {
               ),
             ),
 
-            // Avatar profil
             _buildAvatar(context),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAiButton() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AIScreen()),
+        );
+      },
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: kDarkCard,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white12, width: 1),
+        ),
+        child: Center(
+          child: ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              colors: [Color(0xFF9B59B6), kNeonGreen],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ).createShader(bounds),
+            child: const Icon(
+              Icons.android,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
         ),
       ),
     );

@@ -1,29 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/names.dart';
-import 'package:test_hh/screens/home.dart';
-
-const kBg       = Color(0xFF080D08);
-const kSurface  = Color(0xFF0F180F);
-const kCard     = Color(0xFF131C13);
-const kCardAlt  = Color(0xFF101810);
-const kGreen    = Color(0xFF82D633);
-const kGreenLt  = Color(0xFFAAF050);
-const kGreenDim = Color(0xFF192B0F);
-const kAccent   = Color(0xFFFFD93D);
-const kRed      = Color(0xFFFF5252);
-const kBlue     = Color(0xFF4FC3F7);
-const kText     = Colors.white;
-const kSub      = Color(0xFF8BA67A);
-const kBorder   = Color(0xFF1C2B1C);
+import 'package:test_hh/constants/colors.dart';
+import 'package:test_hh/screens/login.dart';
+import 'package:test_hh/screens/register.dart';
 
 const _imgHero = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=85';
 
 
-void _goHome(BuildContext context) {
+void _goLogin(BuildContext context) {
   Navigator.of(context).push(
     PageRouteBuilder(
       transitionDuration: const Duration(milliseconds: 500),
-      pageBuilder: (_, a, __) => const HomeScreen(),
+      pageBuilder: (_, a, __) => const LoginScreen(),
       transitionsBuilder: (_, a, __, child) => SlideTransition(
         position: Tween<Offset>(
           begin: const Offset(1, 0),
@@ -35,7 +23,21 @@ void _goHome(BuildContext context) {
   );
 }
 
-// ─── Splash ──────────────────────────────────────────────────────────────────
+void _goRegister(BuildContext context) {
+  Navigator.of(context).push(
+    PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 500),
+      pageBuilder: (_, a, __) => const RegisterScreen(),
+      transitionsBuilder: (_, a, __, child) => SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(parent: a, curve: Curves.easeOutCubic)),
+        child: child,
+      ),
+    ),
+  );
+}
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -141,8 +143,6 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-// ─── Welcome ─────────────────────────────────────────────────────────────────
-
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
   @override
@@ -179,7 +179,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Hero background
           Positioned.fill(
             child: Image.network(
               _imgHero,
@@ -191,7 +190,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             ),
           ),
 
-          // Gradient overlay
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -210,7 +208,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             ),
           ),
 
-          // Green ambient glow
           Positioned(
             top: -80,
             right: -60,
@@ -224,12 +221,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             ),
           ),
 
-          // Content
           SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Logo bar
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                   child: Row(
@@ -260,7 +255,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
                 const Spacer(),
 
-                // Animated bottom content
                 SlideTransition(
                   position: _slideUp,
                   child: FadeTransition(
@@ -270,7 +264,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Badge
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 14, vertical: 6),
@@ -299,7 +292,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                           const SizedBox(height: 18),
 
-                          // Headline
                           const Text(
                             'Fuel Your Body.\nCrush Every\nGoal.',
                             style: TextStyle(
@@ -312,7 +304,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                           const SizedBox(height: 16),
 
-                          // Subtext
                           Text(
                             'Track calories, plan meals, and optimize your\nnutrition with smart AI insights.',
                             style: TextStyle(
@@ -323,7 +314,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                           const SizedBox(height: 32),
 
-                          // Feature pills
                           Wrap(
                             spacing: 10,
                             runSpacing: 10,
@@ -341,12 +331,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                           const SizedBox(height: 36),
 
-                          // ── CTA button → HomeScreen ──
                           SizedBox(
                             width: double.infinity,
                             height: 58,
                             child: ElevatedButton(
-                              onPressed: () => _goHome(context),
+                              onPressed: () => _goLogin(context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: kGreen,
                                 foregroundColor: Colors.black,
@@ -374,10 +363,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                           const SizedBox(height: 14),
 
-                          // ── Sign In → HomeScreen ──
                           Center(
                             child: GestureDetector(
-                              onTap: () => _goHome(context),
+                              onTap: () => _goRegister(context),
                               child: RichText(
                                 text: const TextSpan(
                                   style: TextStyle(color: kSub, fontSize: 13),
@@ -409,8 +397,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
-
-// ─── Feature pill ─────────────────────────────────────────────────────────────
 
 class _FeaturePill extends StatelessWidget {
   final IconData icon;

@@ -4,15 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/components/header.dart';
+import 'package:test_hh/constants/urls.dart';
 import 'package:test_hh/models/client.dart';
 import 'package:test_hh/models/coach.dart';
 import 'package:test_hh/models/food.dart';
-import 'package:test_hh/services/api_service.dart';
+import 'package:test_hh/services/apiService.dart';
 import 'package:test_hh/session/user_session.dart';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SCREEN
-// ─────────────────────────────────────────────────────────────────────────────
 
 class ClientScreen extends StatefulWidget {
   final Client? client;
@@ -71,7 +68,6 @@ class _ClientScreenState extends State<ClientScreen> {
       return;
     }
 
-    // Safely build a Coach from the nested 'coach' key if present in raw data
     Coach? coach;
     final rawCoach = session['coach'];
     if (rawCoach is Map<String, dynamic>) {
@@ -119,7 +115,7 @@ class _ClientScreenState extends State<ClientScreen> {
         if (token != null) 'Authorization': 'Bearer $token',
       };
       final uri = Uri.parse(
-          'http://192.168.0.232:5000/api/pahae/addFood/recent/${_client!.id}');
+          'http://$kBaseUrl/api/pahae/addFood/recent/${_client!.id}');
       final res = await http
           .get(uri, headers: headers)
           .timeout(const Duration(seconds: 10));
@@ -148,7 +144,7 @@ class _ClientScreenState extends State<ClientScreen> {
         if (token != null) 'Authorization': 'Bearer $token',
       };
       final uri = Uri.parse(
-          'http://192.168.0.232:5000/api/jihane/clients/${_client!.id}/weight-history');
+          'http://$kBaseUrl/api/jihane/clients/${_client!.id}/weight-history');
       final res = await http
           .get(uri, headers: headers)
           .timeout(const Duration(seconds: 10));
@@ -1063,8 +1059,6 @@ class _ClientScreenState extends State<ClientScreen> {
         child: const Icon(Icons.person, color: kNeonGreen, size: 22),
       );
 }
-
-// ─── Painters ───────────────────────────────────────────────────────────────
 
 class _WeightEntry {
   final String month;

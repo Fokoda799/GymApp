@@ -4,10 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/components/header.dart';
 import 'package:test_hh/constants/urls.dart';
-import 'package:test_hh/session/user_session.dart'; // ← NEW
+import 'package:test_hh/session/user_session.dart';
 import '../models/coach.dart';
 
-// ─── Service ───────────────────────────────────────────────────────────────
 class CoachService {
   static Future<List<Coach>> fetchCoaches() async {
     final response = await http.get(Uri.parse('$kBaseUrl/api/coach'));
@@ -34,10 +33,7 @@ class CoachService {
   }
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────
 class CoachesPage extends StatefulWidget {
-  /// Plus besoin de passer currentClientID depuis l'extérieur :
-  /// on le récupère directement depuis UserSession.
   const CoachesPage({super.key});
 
   @override
@@ -48,7 +44,6 @@ class _CoachesPageState extends State<CoachesPage> {
   late Future<List<Coach>> _coachesFuture;
   final Set<int> _pendingInvites = {};
 
-  // ID du client connecté — récupéré depuis UserSession
   int get _currentClientID => UserSession.instance.id;
 
   @override
@@ -58,7 +53,6 @@ class _CoachesPageState extends State<CoachesPage> {
     _coachesFuture = CoachService.fetchCoaches();
   }
 
-  /// Charge la session si elle n'est pas encore disponible.
   Future<void> _ensureSession() async {
     if (!UserSession.instance.isLoaded) {
       await UserSession.instance.load();
@@ -73,13 +67,12 @@ class _CoachesPageState extends State<CoachesPage> {
   }
 
   String _formatDate(DateTime? d) {
-  if (d == null) return '—'; // Valeur par défaut si null
+  if (d == null) return '—';
   return '${d.day.toString().padLeft(2, '0')} / ${d.month.toString().padLeft(2, '0')} / ${d.year}';
 }
 
   Future<void> _onInvite(Coach coach) async {
     if (_currentClientID == 0) {
-      // Session pas encore chargée
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Session non initialisée, veuillez réessayer.'),
@@ -133,7 +126,6 @@ class _CoachesPageState extends State<CoachesPage> {
         children: [
           const SizedBox(height: 20),
 
-          // ── Header row ──────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Row(
@@ -148,7 +140,6 @@ class _CoachesPageState extends State<CoachesPage> {
                     letterSpacing: 1.5,
                   ),
                 ),
-                // Nom du user connecté (info contextuelle)
                 if (UserSession.instance.isLoaded)
                   Text(
                     UserSession.instance.name,
@@ -171,7 +162,6 @@ class _CoachesPageState extends State<CoachesPage> {
           ),
           const SizedBox(height: 14),
 
-          // ── Liste ───────────────────────────────────────────────────────
           Expanded(
             child: FutureBuilder<List<Coach>>(
               future: _coachesFuture,
@@ -259,7 +249,6 @@ class _CoachesPageState extends State<CoachesPage> {
   }
 }
 
-// ─── Card ──────────────────────────────────────────────────────────────────
 class _CoachCard extends StatelessWidget {
   final Coach        coach;
   final String       formattedDate;
@@ -293,7 +282,6 @@ class _CoachCard extends StatelessWidget {
             horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            // Avatar
             Container(
               width: 48, height: 48,
               decoration: BoxDecoration(
@@ -314,7 +302,6 @@ class _CoachCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 14),
-            // Infos
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,7 +334,6 @@ class _CoachCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            // Bouton Inviter
             GestureDetector(
               onTap: isInvited ? null : onInvite,
               child: AnimatedContainer(

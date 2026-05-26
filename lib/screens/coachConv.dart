@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/screens/chat.dart';
-import 'package:test_hh/services/chatapi_service.dart';
+import 'package:test_hh/services/chatApiService.dart';
+import 'package:test_hh/models/chatSession.dart';
 
-/// Écran liste pour le COACH : affiche toutes ses conversations avec ses clients.
 class CoachConversationsScreen extends StatefulWidget {
   final int coachId;
   final String coachName;
@@ -34,6 +34,8 @@ class _CoachConversationsScreenState extends State<CoachConversationsScreen> {
     try {
       final convs = await ChatApiService.getConversations();
       setState(() { _conversations = convs; _isLoading = false; });
+      print("conversations gotten :");
+      print(convs);
     } catch (e) {
       setState(() { _isLoading = false; _errorMsg = 'Erreur de chargement : $e'; });
     }
@@ -42,6 +44,7 @@ class _CoachConversationsScreenState extends State<CoachConversationsScreen> {
   void _openChat(Map<String, dynamic> conv) {
     final clientId = conv['clientID'] as int?;
     final clientName = conv['clientName'] as String? ?? 'Client';
+    final clientImage = conv['clientImage'] as String? ?? '';
 
     if (clientId == null) {
       _showSnack('ID client manquant.');
@@ -58,6 +61,7 @@ class _CoachConversationsScreenState extends State<CoachConversationsScreen> {
             coachInitials: _initials(widget.coachName),
             clientId: clientId,
             clientName: clientName,
+            clientImage: clientImage,
             clientInitials: _initials(clientName),
             role: 'coach',
           ),
@@ -189,6 +193,7 @@ class _CoachConversationsScreenState extends State<CoachConversationsScreen> {
 
   Widget _buildTile(Map<String, dynamic> conv) {
     final clientName = conv['clientName'] as String? ?? 'Client';
+    final clientImage = conv['clientImage'] as String? ?? 'Client';
     final lastMessage = conv['lastMessage'] as String? ?? 'Aucun message';
     final unread = (conv['unreadCount'] as num?)?.toInt() ?? 0;
     final rawTime = conv['lastMessageTime'];
@@ -213,16 +218,25 @@ class _CoachConversationsScreenState extends State<CoachConversationsScreen> {
                   width: 1.5,
                 ),
               ),
-              child: Center(
-                child: Text(
-                  _initials(clientName),
-                  style: const TextStyle(
-                    color: kNeonGreen,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
+              child: clientImage.isNotEmpty && clientImage != 'Client'
+                  ? ClipOval(
+                      child: Image.network(
+                        clientImage,
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        _initials(clientName),
+                        style: const TextStyle(
+                          color: kNeonGreen,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
             ),
             const SizedBox(width: 14),
             Expanded(

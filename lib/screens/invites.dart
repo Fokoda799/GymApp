@@ -1,52 +1,11 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:test_hh/components/navbarCoach.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/constants/urls.dart';
 import 'package:test_hh/session/user_session.dart';
-import '../models/client.dart';
+import 'package:test_hh/models/client.dart';
+import 'package:test_hh/services/inviteService.dart';
 
-// ─── Service ───────────────────────────────────────────────────────────────
-class InviteService {
-  static Future<List<Client>> fetchInvites(int coachID) async {
-    final response =
-        await http.get(Uri.parse('$kBaseUrl/api/invite/coach/$coachID'));
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((j) => Client.fromJson(j)).toList();
-    }
-    throw Exception(
-        'Impossible de charger les invitations (${response.statusCode})');
-  }
-
-  static Future<void> acceptInvite(
-      {required int coachID, required int clientID}) async {
-    final response = await http.post(
-      Uri.parse('$kBaseUrl/api/invite/accept'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'coachID': coachID, 'clientID': clientID}),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Échec de l\'acceptation (${response.statusCode})');
-    }
-  }
-
-  static Future<void> refuseInvite(
-      {required int coachID, required int clientID}) async {
-    final response = await http.post(
-      Uri.parse('$kBaseUrl/api/invite/refuse'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'coachID': coachID, 'clientID': clientID}),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Échec du refus (${response.statusCode})');
-    }
-  }
-}
-
-// ─── Page ──────────────────────────────────────────────────────────────────
 class InvitesPage extends StatefulWidget {
   const InvitesPage({super.key});
 
@@ -99,7 +58,6 @@ class _InvitesPageState extends State<InvitesPage> {
     return age;
   }
 
-  // ── Accept ──────────────────────────────────────────────────────────────
   Future<void> _onAccept(Client client) async {
     if (_processing.contains(client.id)) return;
     setState(() => _processing.add(client.id));
@@ -130,7 +88,6 @@ class _InvitesPageState extends State<InvitesPage> {
     }
   }
 
-  // ── Refuse ──────────────────────────────────────────────────────────────
   void _onRefuse(Client client) {
     final TextEditingController reasonController = TextEditingController();
 
@@ -307,7 +264,6 @@ class _InvitesPageState extends State<InvitesPage> {
     );
   }
 
-  // ── Build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     if (!_session.isLoaded || !_session.isCoach) {
@@ -484,7 +440,6 @@ class _InvitesPageState extends State<InvitesPage> {
   }
 }
 
-// ─── Card ──────────────────────────────────────────────────────────────────
 class _InviteCard extends StatelessWidget {
   final Client client;
   final int age;

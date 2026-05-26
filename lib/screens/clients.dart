@@ -9,7 +9,6 @@ import 'package:test_hh/screens/client.dart';
 import 'package:test_hh/models/client.dart';
 import 'package:test_hh/session/user_session.dart';
 
-// ── Screen ──────────────────────────────────────────────────────────────────
 class ClientsScreen extends StatefulWidget {
   const ClientsScreen({super.key});
 
@@ -20,13 +19,12 @@ class ClientsScreen extends StatefulWidget {
 class _ClientsScreenState extends State<ClientsScreen> {
   final TextEditingController _searchCtrl = TextEditingController();
   String _query = '';
-  String? _filterGender; // null = all, "male", "female"
+  String? _filterGender;
 
   List<Client> _clients = [];
   bool _isLoading = true;
   String? _errorMessage;
 
-  // ID du coach connecté, chargé depuis UserSession
   int? _coachID;
 
   @override
@@ -44,13 +42,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
     super.dispose();
   }
 
-  // ── Session ────────────────────────────────────────────────────────────────
-
-  /// Charge la session si nécessaire, puis récupère les clients.
   Future<void> _initSession() async {
   print('=== _initSession START ===');
-  
-  // ✅ Toujours recharger pour avoir les données fraîches
   final ok = await UserSession.instance.load();
   print('=== load() returned: $ok ===');
   print('=== coachID: ${UserSession.instance.id} ===');
@@ -67,8 +60,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
   _coachID = UserSession.instance.id;
   await _fetchClients();
 }
-
-  // ── API calls ──────────────────────────────────────────────────────────────
 
   Future<void> _fetchClients() async {
     if (_coachID == null) {
@@ -149,8 +140,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
     );
   }
 
-  // ── Filtering ──────────────────────────────────────────────────────────────
-
   List<Client> get _filtered {
     return _clients.where((c) {
       final matchSearch = c.name.toLowerCase().contains(_query);
@@ -158,8 +147,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
       return matchSearch && matchGender;
     }).toList();
   }
-
-  // ── Remove dialog ──────────────────────────────────────────────────────────
 
   void _confirmRemove(Client client) {
     showDialog(
@@ -198,8 +185,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
       ),
     );
   }
-
-  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -255,8 +240,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
     );
   }
 
-  // ── Network error ──────────────────────────────────────────────────────────
-
   Widget _buildNetworkError() {
     return Center(
       child: Padding(
@@ -301,8 +284,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
     );
   }
 
-  // ── Section title ──────────────────────────────────────────────────────────
-
   Widget _buildTitle() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -330,8 +311,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
       ),
     );
   }
-
-  // ── Search bar ─────────────────────────────────────────────────────────────
 
   Widget _buildSearchBar() {
     return Padding(
@@ -375,8 +354,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
       ),
     );
   }
-
-  // ── Filter chips ───────────────────────────────────────────────────────────
 
   Widget _buildFilterChips() {
     final filters = <String, String?>{
@@ -425,8 +402,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
     );
   }
 
-  // ── Count label ────────────────────────────────────────────────────────────
-
   Widget _buildCount(int count) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -441,8 +416,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
       ),
     );
   }
-
-  // ── Client card ────────────────────────────────────────────────────────────
 
   Widget _buildClientCard(Client client) {
     return GestureDetector(
@@ -631,8 +604,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
       ),
     );
   }
-
-  // ── Empty state ────────────────────────────────────────────────────────────
 
   Widget _buildEmpty() {
     final isFiltering = _query.isNotEmpty || _filterGender != null;

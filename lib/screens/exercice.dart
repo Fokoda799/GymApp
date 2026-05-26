@@ -2,12 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/screens/tutorial.dart';
 import 'package:test_hh/constants/urls.dart';
-
-// ─── Models ───────────────────────────────────────────────────────────────────
 
 class NoteModel {
   final String id;
@@ -78,12 +75,9 @@ class ExerciceModel {
   String get image     => imageUrl;
 }
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
-
 class ExerciceScreen extends StatefulWidget {
   final String exerciceID;
-  final String exerciceName; // pour afficher pendant le loading
-
+  final String exerciceName;
   const ExerciceScreen({
     super.key,
     required this.exerciceID,
@@ -104,8 +98,6 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
     super.initState();
     _fetchExercice();
   }
-
-  // ── API ───────────────────────────────────────────────────────────────────
 
   Future<void> _fetchExercice() async {
     setState(() { _loading = true; _error = null; });
@@ -131,8 +123,6 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
       });
     }
   }
-
-  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -206,8 +196,6 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
       // bottomNavigationBar: NavBar(),
     );
   }
-
-  // ─── HERO ─────────────────────────────────────────────────────────────────
 
   Widget _buildHero(BuildContext context, ExerciceModel ex) {
     return Stack(
@@ -288,44 +276,74 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
     );
   }
 
-  // ─── INFO ROW ─────────────────────────────────────────────────────────────
-
   Widget _buildInfoRow(BuildContext context, ExerciceModel ex) {
-    return Row(
+    return Column(
       children: [
-        _buildStatCard(Icons.local_fire_department_outlined, ex.typeLabel, 'Type'),
-        const SizedBox(width: 10),
-        _buildStatCard(Icons.notes_rounded, '${ex.notes.length}', 'Steps'),
-        const SizedBox(width: 10),
-        Expanded(
-          child: GestureDetector(
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => TutorialScreen(exercice: ex))),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
-              decoration: BoxDecoration(
-                color: kNeonGreen,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                      color: kNeonGreen.withOpacity(0.25),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4))
-                ],
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                Icons.local_fire_department_outlined,
+                ex.typeLabel,
+                'Type',
               ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.play_circle_outline, color: Colors.black, size: 18),
-                  SizedBox(width: 6),
-                  Text('TUTORIAL',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.8)),
-                ],
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildStatCard(
+                Icons.notes_rounded,
+                '${ex.notes.length}',
+                'Steps',
               ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 10),
+
+        GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => TutorialScreen(exercice: ex),
+            ),
+          ),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              vertical: 14,
+              horizontal: 14,
+            ),
+            decoration: BoxDecoration(
+              color: kNeonGreen,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: kNeonGreen.withOpacity(0.25),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                )
+              ],
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.play_circle_outline,
+                  color: Colors.black,
+                  size: 18,
+                ),
+                SizedBox(width: 6),
+                Text(
+                  'TUTORIAL',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -364,8 +382,6 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
     );
   }
 
-  // ─── DESCRIPTION ──────────────────────────────────────────────────────────
-
   Widget _buildDescriptionCard(ExerciceModel ex) {
     return Container(
       width: double.infinity,
@@ -389,8 +405,6 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
       ),
     );
   }
-
-  // ─── NOTES LIST ───────────────────────────────────────────────────────────
 
   Widget _buildNotesList(ExerciceModel ex) {
     return Container(
@@ -466,8 +480,6 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
     );
   }
 
-  // ─── TUTORIAL BANNER ──────────────────────────────────────────────────────
-
   Widget _buildTutorialBanner(BuildContext context, ExerciceModel ex) {
     return GestureDetector(
       onTap: () => Navigator.push(context,
@@ -516,8 +528,6 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
       ),
     );
   }
-
-  // ─── Shared ───────────────────────────────────────────────────────────────
 
   Widget _buildSectionHeader(IconData icon, String label) {
     return Row(

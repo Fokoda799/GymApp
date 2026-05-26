@@ -41,7 +41,6 @@ class ChatMessage {
     );
   }
 
-  /// Message envoyé par le coach humain
   factory ChatMessage.fromCoach({
     required String id,
     required String text,

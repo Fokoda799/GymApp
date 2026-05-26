@@ -3,7 +3,7 @@ import 'package:test_hh/models/client.dart';
 class Coach {
   final int id;
   final String name;
-  final DateTime? createdAt; // Rendu optionnel
+  final DateTime? createdAt;
   final String image;
   final List<Client> clients;
   final String? specialty;
@@ -12,7 +12,7 @@ class Coach {
   const Coach({
     required this.id,
     required this.name,
-    this.createdAt, // Optionnel
+    this.createdAt,
     required this.image,
     List<Client>? clients,
     this.specialty,
@@ -25,7 +25,7 @@ class Coach {
       name: json['name'] ?? '',
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])
-          : null, // Optionnel
+          : null,
       image: json['image'] ?? '',
       clients: json['clients'] != null
           ? (json['clients'] as List)
@@ -41,11 +41,11 @@ class Coach {
     return {
       'id': id,
       'name': name,
-      if (createdAt != null) 'createdAt': createdAt!.toIso8601String(), // Optionnel
+      if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
       'image': image,
       'clients': clients.map((c) => c.toJson()).toList(),
-      if (specialty != null) 'specialty': specialty, // Optionnel
-      if (bio != null) 'bio': bio, // Optionnel
+      if (specialty != null) 'specialty': specialty,
+      if (bio != null) 'bio': bio,
     };
   }
 

@@ -33,15 +33,85 @@ const mapBodyPart = (row, exercises = []) => ({
 // GET /api/exercises/bodyparts
 // Returns every body part (no exercises embedded – for a list/picker screen).
 // ─────────────────────────────────────────────────────────────────────────────
-router.get("/bodyparts", async (req, res) => {
+router.get("/bodypartsAll", async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      "SELECT id, name, image FROM BodyParts ORDER BY name ASC"
-    );
-    res.json({ success: true, data: rows.map((r) => mapBodyPart(r)) });
+    const [rows] = await pool.query(`
+      SELECT
+        b.id AS bodyPartID,
+        b.name AS bodyPartName,
+        b.image AS bodyPartImage,
+        e.id AS exerciceID,
+        e.name AS exerciceName,
+        e.image AS exerciceImage
+      FROM BodyParts b
+      LEFT JOIN Exercises e
+      ON b.id = e.bodyPartID
+      ORDER BY b.name ASC, e.name ASC
+    `);
+
+    const bodyPartsMap = {};
+
+    rows.forEach(row => {
+      if (!bodyPartsMap[row.bodyPartID]) {
+        bodyPartsMap[row.bodyPartID] = {
+          id: row.bodyPartID,
+          name: row.bodyPartName,
+          image: row.bodyPartImage,
+          exercices: []
+        };
+      }
+
+      if (row.exerciceID) {
+        bodyPartsMap[row.bodyPartID].exercices.push({
+          id: row.exerciceID,
+          name: row.exerciceName,
+          image: row.exerciceImage
+        });
+      }
+    });
+
+    res.json({
+      success: true,
+      data: Object.values(bodyPartsMap)
+    });
+
   } catch (err) {
     console.error("GET /bodyparts:", err.message);
-    res.status(500).json({ success: false, message: "Failed to fetch body parts" });
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch body parts"
+    });
+  }
+});
+
+router.get("/bodyparts", async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT
+        b.id,
+        b.name,
+        b.image,
+        COUNT(e.id) AS exercicesCount
+      FROM BodyParts b
+      LEFT JOIN Exercises e
+      ON b.id = e.bodyPartID
+      GROUP BY b.id, b.name, b.image
+      ORDER BY b.name ASC
+    `);
+
+    res.json({
+      success: true,
+      data: rows
+    });
+
+  } catch (err) {
+    console.error("GET /bodyparts:", err.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch body parts"
+    });
   }
 });
 

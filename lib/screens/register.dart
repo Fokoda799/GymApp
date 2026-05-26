@@ -6,8 +6,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:test_hh/constants/colors.dart';
-import 'package:test_hh/screens/home.dart';
-import 'package:test_hh/services/api_service.dart';
+import 'package:test_hh/screens/login.dart';
+import 'package:test_hh/services/apiService.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,13 +17,11 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  // --- État du formulaire ---
   int _currentStep = 0;
   final int _totalSteps = 5;
   bool _isLoading = false;
   int? _selectedCoachId;
 
-  // Contrôleurs pour les champs texte
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -31,8 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _heightController = TextEditingController();
   final _weightGoalController = TextEditingController();
 
-  // Données du formulaire
-  XFile? _profileImage; // ✅ XFile au lieu de File
+  XFile? _profileImage;
   DateTime? _birthDate;
   String? _gender;
   double _weight = 70;
@@ -43,7 +40,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _goal = 'Lose Weight';
   int _frequency = 1;
 
-  // Options pour les objectifs et fréquences
   final List<Map<String, dynamic>> _goals = [
     {'icon': Icons.local_fire_department, 'title': 'Lose Weight', 'sub': 'Burn fat, get lean'},
     {'icon': Icons.fitness_center, 'title': 'Build Muscle', 'sub': 'Gain mass & strength'},
@@ -61,7 +57,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     {'title': 'Athlete', 'sub': '6 – 7 days / week'},
   ];
 
-  // --- Cycle de vie ---
   @override
   void initState() {
     super.initState();
@@ -81,7 +76,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  // --- Logique métier ---
   String get _weightLabel => _weightInKg ? 'KG' : 'LBS';
   String get _heightLabel => _heightInCm ? 'CM' : 'FT';
   double get _displayWeight => _weightInKg ? _weight : _weight * 2.205;
@@ -115,7 +109,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // ✅ Sélection image — retourne XFile
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -124,7 +117,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // ✅ Upload vers Cloudinary — retourne l'URL sécurisée
   Future<String?> _uploadImageToCloudinary(XFile imageFile) async {
     try {
       final uri = Uri.parse(
@@ -165,7 +157,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // Sélection de la date de naissance
   Future<void> _pickDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -188,7 +179,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // Validation des champs obligatoires
   bool _validateStep() {
     switch (_currentStep) {
       case 0:
@@ -227,13 +217,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // ✅ Inscription avec upload Cloudinary avant envoi backend
   Future<void> _submitRegistration() async {
     if (!_validateStep()) return;
     setState(() => _isLoading = true);
 
     try {
-      // 1️⃣ Upload image vers Cloudinary
       String? imageUrl;
       if (_profileImage != null) {
         imageUrl = await _uploadImageToCloudinary(_profileImage!);
@@ -244,12 +232,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
       }
 
-      // 2️⃣ Envoi des données au backend avec l'URL Cloudinary
       final response = await ApiService.register(
         name: _nameController.text,
         email: _emailController.text,
         password: _passwordController.text,
-        image: imageUrl, // ✅ URL Cloudinary (ex: https://res.cloudinary.com/...)
+        image: imageUrl,
         birth: _birthDate != null ? DateFormat('yyyy-MM-dd').format(_birthDate!) : null,
         weight: _weightInKg ? _weight : _weight / 2.205,
         height: _heightInCm ? _height : _height * 30.48,
@@ -264,7 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
         );
       } else {
         _showErrorSnackbar(response['message'] ?? 'Registration failed.');
@@ -276,7 +263,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // Navigation entre les étapes
   void _next() {
     if (_currentStep < _totalSteps - 1) {
       if (_validateStep()) {
@@ -295,7 +281,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // --- Titres des étapes ---
   String _stepTitle() {
     switch (_currentStep) {
       case 0: return 'YOUR\n';
@@ -326,7 +311,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // --- Construction de l'UI ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -471,7 +455,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // --- Étape 1: Profil ---
   Widget _buildStep1() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -491,7 +474,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: kNeonGreen.withOpacity(0.06),
                         border: Border.all(color: kNeonGreen.withOpacity(0.35), width: 2),
                       ),
-                      // ✅ Affichage image selon plateforme
                       child: _profileImage != null
                           ? ClipOval(
                               child: kIsWeb
@@ -637,7 +619,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // --- Étape 2: Stats ---
   Widget _buildStep2() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -816,7 +797,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // --- Étape 3: Objectif ---
   Widget _buildStep3() {
     return GridView.count(
       crossAxisCount: 2,
@@ -858,7 +838,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // --- Étape 4: Fréquence ---
   Widget _buildStep4() {
     return Column(
       children: _frequencies.asMap().entries.map((entry) {
@@ -918,7 +897,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // --- Étape 5: Résumé ---
   Widget _buildStep5() {
     return Column(
       children: [
