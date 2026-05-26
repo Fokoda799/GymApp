@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/names.dart';
-import 'package:test_hh/services/api_service.dart';
+import 'package:test_hh/services/apiService.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -45,7 +45,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       'Email envoyé ! Vérifiez votre boîte mail.',
       isError: false,
     );
-    // Retourner au login après 2 secondes
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) Navigator.pop(context);
   } else {
@@ -75,7 +74,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          // ── Background image top ──
           Positioned(
             top: 0,
             left: 0,
@@ -103,7 +101,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           ),
 
-          // ── Neon glow blobs ──
           Positioned(
             top: -80,
             right: -80,
@@ -139,7 +136,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           ),
 
-          // ── Main content ──
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 36),
@@ -169,7 +165,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   _buildResetButton(),
                   const SizedBox(height: 20),
 
-                  // Retour à la page de connexion
                   Align(
                     alignment: Alignment.center,
                     child: GestureDetector(

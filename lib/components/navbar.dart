@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/colors.dart';
-import 'package:test_hh/models/client.dart';
+
 import 'package:test_hh/screens/home.dart';
 import 'package:test_hh/screens/foods.dart';
 import 'package:test_hh/screens/bodyParts.dart';

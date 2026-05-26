@@ -9,7 +9,7 @@ import 'package:test_hh/models/client.dart';
 import 'package:test_hh/models/coach.dart';
 import 'package:test_hh/screens/login.dart';
 import 'package:test_hh/screens/profileClient.dart';
-import 'package:test_hh/services/api_service.dart';
+import 'package:test_hh/services/apiService.dart';
 import 'package:test_hh/session/user_session.dart';
 
 class ProfileCoach extends StatefulWidget {
@@ -65,12 +65,11 @@ class _ProfileCoachState extends State<ProfileCoach> {
     super.dispose();
   }
 
-  // --- Cloudinary Upload ---
   Future<String?> _uploadImageToCloudinary(XFile imageFile) async {
     try {
       final uri = Uri.parse("https://api.cloudinary.com/v1_1/dlqcknocf/image/upload");
       final request = http.MultipartRequest("POST", uri);
-      request.fields['upload_preset'] = 'GymApp'; // Remplacez par votre preset Cloudinary
+      request.fields['upload_preset'] = 'GymApp';
 
       if (kIsWeb) {
         final bytes = await imageFile.readAsBytes();
@@ -99,7 +98,6 @@ class _ProfileCoachState extends State<ProfileCoach> {
     }
   }
 
-  // --- Load Coach Profile ---
   Future<void> _loadCoach() async {
     setState(() { _isLoading = true; _error = null; });
 
@@ -146,7 +144,6 @@ class _ProfileCoachState extends State<ProfileCoach> {
     }
   }
 
-  // --- Save Coach Profile ---
   Future<void> _saveCoach() async {
     if (_coach == null) return;
 
@@ -181,7 +178,7 @@ class _ProfileCoachState extends State<ProfileCoach> {
       setState(() {
         _coach = updated.copyWith(clients: _coach!.clients);
         _imageUrl = updated.image;
-        _profileImage = null; // Réinitialiser après sauvegarde
+        _profileImage = null;
       });
     }
 
@@ -198,7 +195,6 @@ class _ProfileCoachState extends State<ProfileCoach> {
     );
   }
 
-  // --- Helper Methods ---
   String _formattedDate(DateTime? d) {
     if (d == null) return '—';
     return '${d.day.toString().padLeft(2, '0')} / ${d.month.toString().padLeft(2, '0')} / ${d.year}';
@@ -236,7 +232,6 @@ class _ProfileCoachState extends State<ProfileCoach> {
     );
   }
 
-  // --- UI Builders ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/urls.dart';
 import 'package:test_hh/models/food.dart';
 import 'package:test_hh/models/exercice.dart';
-import 'package:test_hh/models/dayProgram.dart';
-import 'package:test_hh/session/user_session.dart'; // ← UserSession
+import 'package:test_hh/session/user_session.dart';
 
 enum _Meal { breakfast, lunch, dinner }
 
@@ -29,17 +27,13 @@ class ProgramCoachScreen extends StatefulWidget {
 }
 
 class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
-  // ── Session ──────────────────────────────────────────────────────────────
   final _session = UserSession.instance;
 
   static const _daysShort = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   static const _daysFull  = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-  /// Headers d'authentification construits depuis le token de session
   Map<String, String> get _headers => {
         'Content-Type': 'application/json',
-        // Le token est géré par ApiService / SharedPreferences ;
-        // on le lit via la session si disponible, sinon on laisse vide.
         if (_session['token'] != null)
           'Authorization': 'Bearer ${_session['token']}',
       };
@@ -152,7 +146,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
     });
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
   List<FoodModel>     _foods(int day, _Meal m) => _week[day][m.name]!     as List<FoodModel>;
   List<ExerciceModel> _exes(int day)            => _week[day]['exercises']! as List<ExerciceModel>;
 
@@ -190,7 +183,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
     }
   }
 
-  // ── Save ──────────────────────────────────────────────────────────────────
   Future<void> _save() async {
     setState(() => _isSaving = true);
     try {
@@ -235,7 +227,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
         body: jsonEncode({
           'clientId': int.tryParse(widget.clientId) ?? 1,
           'week': weekPayload,
-          // On ajoute l'ID du coach connecté pour traçabilité côté API
           'coachId': _session.id,
         }),
       );
@@ -291,7 +282,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
     }
   }
 
-  // ─── Bottom sheet: food picker ────────────────────────────────────────────
   void _openFoodPicker(_Meal meal) {
     final added = _foods(_selectedDay, meal).map((f) => f.id).toSet();
     String q = '';
@@ -391,7 +381,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
     );
   }
 
-  // ─── Bottom sheet: exercise picker ────────────────────────────────────────
   void _openExercisePicker() {
     final added = _exes(_selectedDay).map((e) => e.id).toSet();
     String q = '';
@@ -561,10 +550,8 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
         ),
       );
 
-  // ─── Build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    // Garde-fou : on vérifie que le coach est bien connecté
     if (!_session.isLoaded || !_session.isCoach) {
       return Scaffold(
         backgroundColor: kDarkBg,
@@ -686,7 +673,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
         ),
       );
 
-  // ─── Top bar ──────────────────────────────────────────────────────────────
   Widget _buildTopBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
@@ -719,11 +705,10 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
                         fontWeight: FontWeight.w800,
                         letterSpacing: 2)),
                 Row(children: [
-                  // Nom du coach connecté depuis la session
                   const Icon(Icons.sports_rounded, color: kNeonGreen, size: 13),
                   const SizedBox(width: 4),
                   Text(
-                    _session.name, // ← coach connecté
+                    _session.name,
                     style: TextStyle(
                         color: Colors.white.withOpacity(0.45),
                         fontSize: 11,
@@ -735,7 +720,7 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
                   const Icon(Icons.person_rounded, color: kNeonGreen, size: 13),
                   const SizedBox(width: 4),
                   Text(
-                    widget.clientName, // ← client cible
+                    widget.clientName,
                     style: TextStyle(
                         color: Colors.white.withOpacity(0.45),
                         fontSize: 11,
@@ -765,7 +750,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
     );
   }
 
-  // ─── Day selector ─────────────────────────────────────────────────────────
   Widget _buildDaySelector() {
     return SizedBox(
       height: 64,
@@ -819,7 +803,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
     );
   }
 
-  // ─── Calorie summary ──────────────────────────────────────────────────────
   Widget _buildCalorieSummary() {
     final bf      = _foods(_selectedDay, _Meal.breakfast).fold(0.0, (s, f) => s + f.calories);
     final lu      = _foods(_selectedDay, _Meal.lunch).fold(0.0, (s, f) => s + f.calories);
@@ -896,7 +879,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
         ),
       );
 
-  // ─── Meal section ─────────────────────────────────────────────────────────
   Widget _buildMealSection(_Meal meal) {
     final foods = _foods(_selectedDay, meal);
     final color = _mealColor(meal);
@@ -977,7 +959,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
         ),
       );
 
-  // ─── Food card ────────────────────────────────────────────────────────────
   Widget _buildFoodCard(FoodModel food, Color accent, _Meal meal, int idx) {
     return Dismissible(
       key: Key('food_${meal.name}_${food.id}_$idx'),
@@ -1069,7 +1050,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
     );
   }
 
-  // ─── Exercises section ────────────────────────────────────────────────────
   Widget _buildExercisesSection() {
     final exes = _exes(_selectedDay);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1144,7 +1124,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
     ]);
   }
 
-  // ─── Exercise card ────────────────────────────────────────────────────────
   Widget _buildExerciseCard(ExerciceModel ex, int idx) {
     final typeColor = _exTypeColor(ex.type);
     return Dismissible(
@@ -1256,7 +1235,6 @@ class _ProgramCoachScreenState extends State<ProgramCoachScreen> {
       );
 }
 
-// ─── Food Picker Tile ─────────────────────────────────────────────────────────
 
 class _FoodPickerTile extends StatefulWidget {
   final FoodModel    food;
@@ -1364,7 +1342,6 @@ class _FoodPickerTileState extends State<_FoodPickerTile> {
   }
 }
 
-// ─── Exercise Picker Tile ─────────────────────────────────────────────────────
 
 class _ExercisePickerTile extends StatefulWidget {
   final ExerciceModel exercise;
@@ -1493,7 +1470,6 @@ class _ExercisePickerTileState extends State<_ExercisePickerTile> {
   }
 }
 
-// ─── Sheet Filter Chip ────────────────────────────────────────────────────────
 
 class _SheetFilterChip extends StatelessWidget {
   final String       label;

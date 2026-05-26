@@ -18,6 +18,4 @@ class DayProgram {
 
   List<FoodModel> get allFoods => [...breakfastFoods, ...lunchFoods, ...dinnerFoods];
   double get totalCalories => allFoods.fold(0, (sum, f) => sum + f.calories);
-
-  // TODO: ajouter fromJson/toJson quand FoodModel et ExerciceModel les auront
 }

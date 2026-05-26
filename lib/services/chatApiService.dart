@@ -104,26 +104,6 @@ class ChatApiService {
     _checkStatus(response);
   }
 
-  // Initier un appel
-  static Future<Map<String, dynamic>> startCall({
-    required int coachId,
-    required int clientId,
-    required String callType,
-  }) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/calls'),
-      headers: await _headers(),
-      body: jsonEncode({
-        'coachId': coachId,
-        'clientId': clientId,
-        'callType': callType,
-      }),
-    );
-    _checkStatus(response);
-    final data = jsonDecode(response.body);
-    return Map<String, dynamic>.from(data['call']);
-  }
-
   // Mettre à jour le statut d'un appel
   static Future<Map<String, dynamic>> updateCallStatus({
     required int callId,

@@ -85,7 +85,7 @@ window.onload = async () => {
 
         statusDiv.innerText = "Connected";
     } catch (e) {
-        alert("Microphone error");
+        // alert("Microphone error");
     }
 };
 
@@ -111,12 +111,12 @@ function displayAudioElement(id, stream, isLocal, firstname, image = null) {
                         </div>
 
                         <div class="mt-3 text-white text-2xl font-bold tracking-wide">
-                            ${isLocal ? 'Vous' : firstname}
+                            ${isLocal ? 'You' : firstname}
                         </div>
 
                         <div id="status-${id}"
                              class="mt-2 px-4 py-1 rounded-full bg-[#A3FF12]/15 border border-[#A3FF12]/40 text-[#A3FF12] text-sm font-semibold">
-                            Connecté
+                            Connected
                         </div>
                     </div>
 
@@ -168,12 +168,12 @@ function displayAudioElement(id, stream, isLocal, firstname, image = null) {
                     micBtn.className =
                         "w-12 h-12 rounded-full bg-[#A3FF12] text-black text-xl font-bold flex items-center justify-center shadow-[0_0_20px_rgba(163,255,18,0.45)]";
 
-                    status.innerText = "Connecté";
+                    status.innerText = "Connected";
                 } else {
                     micBtn.className =
                         "w-12 h-12 rounded-full bg-red-500 text-white text-xl font-bold flex items-center justify-center";
 
-                    status.innerText = "Micro coupé";
+                    status.innerText = "Silent";
                 }
             };
         }
@@ -211,7 +211,7 @@ function displayAudioElement(id, stream, isLocal, firstname, image = null) {
                 avatarBox.style.boxShadow =
                     "0 0 45px rgba(163,255,18,0.95)";
 
-                status.innerText = "Parle...";
+                status.innerText = "Speaking...";
             } else {
                 speaking.className =
                     "w-3 h-3 rounded-full bg-gray-500";
@@ -223,7 +223,7 @@ function displayAudioElement(id, stream, isLocal, firstname, image = null) {
                 avatarBox.style.boxShadow =
                     "0 0 35px rgba(163,255,18,0.45)";
 
-                status.innerText = "Connecté";
+                status.innerText = "Connected";
             }
 
             requestAnimationFrame(detectVoice);

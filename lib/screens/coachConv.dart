@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/screens/chat.dart';
-import 'package:test_hh/services/chatapi_service.dart';
+import 'package:test_hh/services/chatApiService.dart';
+import 'package:test_hh/models/chatSession.dart';
 
-/// Écran liste pour le COACH : affiche toutes ses conversations avec ses clients.
 class CoachConversationsScreen extends StatefulWidget {
   final int coachId;
   final String coachName;

@@ -6,9 +6,8 @@ import 'package:test_hh/components/header.dart';
 import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/urls.dart';
-import 'package:test_hh/session/user_session.dart'; // ← UserSession
+import 'package:test_hh/session/user_session.dart';
 
-// ─── Model ────────────────────────────────────────────────────────────────────
 
 class WeightEntry {
   final DateTime date;
@@ -16,7 +15,6 @@ class WeightEntry {
   const WeightEntry({required this.date, required this.weight});
 }
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 class StatScreen extends StatefulWidget {
   const StatScreen({super.key});
@@ -27,13 +25,11 @@ class StatScreen extends StatefulWidget {
 
 class _StatScreenState extends State<StatScreen>
     with SingleTickerProviderStateMixin {
-  // ── Session ──────────────────────────────────────────────────────────────
   final _session = UserSession.instance;
 
   late AnimationController _barCtrl;
   late Animation<double> _barAnim;
 
-  // ── État de l'historique ──────────────────────────────────────────────────
   List<WeightEntry> _history = [];
   bool _loadingHistory = true;
   String? _historyError;
@@ -55,37 +51,35 @@ class _StatScreenState extends State<StatScreen>
     super.dispose();
   }
 
-  // ── API ───────────────────────────────────────────────────────────────────
   Future<void> _fetchWeightHistory() async {
     setState(() {
       _loadingHistory = true;
-      _historyError   = null;
+      _historyError = null;
     });
     try {
-      // On utilise l'ID du client connecté depuis la session
       final uri = Uri.parse(
           '$kBaseUrl/api/stat/${_session.id}/weight-history');
       final response =
           await http.get(uri).timeout(const Duration(seconds: 10));
 
       if (response.statusCode != 200) {
-        throw Exception('Erreur ${response.statusCode}');
+        throw Exception('Error ${response.statusCode}');
       }
 
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       if (body['success'] != true) throw Exception(body['message']);
 
-      final list    = body['data'] as List<dynamic>;
+      final list = body['data'] as List<dynamic>;
       final entries = list.map((e) {
         final map = e as Map<String, dynamic>;
         return WeightEntry(
-          date:   DateTime.parse(map['date'] as String),
+          date: DateTime.parse(map['date'] as String),
           weight: (map['weight'] as num).toDouble(),
         );
       }).toList();
 
       setState(() {
-        _history        = entries;
+        _history = entries;
         _loadingHistory = false;
       });
 
@@ -93,7 +87,7 @@ class _StatScreenState extends State<StatScreen>
           const Duration(milliseconds: 300), _barCtrl.forward);
     } catch (e) {
       setState(() {
-        _historyError   = e.toString();
+        _historyError = e.toString();
         _loadingHistory = false;
       });
       Future.delayed(
@@ -101,13 +95,12 @@ class _StatScreenState extends State<StatScreen>
     }
   }
 
-  // ── Helpers (lisent la session au lieu d'un objet Client hardcodé) ────────
-  double get _start   => _history.isNotEmpty
+  double get _start => _history.isNotEmpty
       ? _history.first.weight
       : _session.weight;
   double get _current => _session.weight;
-  double get _goal    => _session.weightGoal;
-  double get _change  => _current - _start;
+  double get _goal => _session.weightGoal;
+  double get _change => _current - _start;
   double get _remaining => (_current - _goal).abs();
 
   double get _ratio {
@@ -123,16 +116,16 @@ class _StatScreenState extends State<StatScreen>
   }
 
   String get _bmiLabel {
-    if (_bmi < 18.5) return 'INSUFFISANT';
-    if (_bmi < 25)   return 'NORMAL';
-    if (_bmi < 30)   return 'SURPOIDS';
-    return 'OBÉSITÉ';
+    if (_bmi < 18.5) return 'UNDERWEIGHT';
+    if (_bmi < 25) return 'NORMAL';
+    if (_bmi < 30) return 'OVERWEIGHT';
+    return 'OBESE';
   }
 
   Color get _bmiColor {
     if (_bmi < 18.5) return const Color(0xFF5BC4F5);
-    if (_bmi < 25)   return kNeonGreen;
-    if (_bmi < 30)   return const Color(0xFFFFA940);
+    if (_bmi < 25) return kNeonGreen;
+    if (_bmi < 30) return const Color(0xFFFFA940);
     return const Color(0xFFFF6B6B);
   }
 
@@ -148,29 +141,27 @@ class _StatScreenState extends State<StatScreen>
   }
 
   String get _eta {
-    if (_history.length < 2)  return '—';
-    if (_remaining < 0.5)     return 'Atteint !';
-    final months     = _history.length - 1;
+    if (_history.length < 2) return '—';
+    if (_remaining < 0.5) return 'Achieved!';
+    final months = _history.length - 1;
     final totalDelta = _history.last.weight - _history.first.weight;
     if (months == 0 || totalDelta.abs() < 0.1) return '—';
-    final rate   = totalDelta / months;
+    final rate = totalDelta / months;
     if (rate.abs() < 0.05) return '—';
     final needed = (_current - _goal) / rate;
-    if (needed <= 0) return 'Atteint !';
-    final r  = needed.round();
-    if (r < 1) return '< 1 mois';
-    if (r < 12) return '$r mois';
+    if (needed <= 0) return 'Achieved!';
+    final r = needed.round();
+    if (r < 1) return '< 1 month';
+    if (r < 12) return '$r months';
     final yr = r ~/ 12;
     final mo = r % 12;
     return mo == 0
-        ? '$yr an${yr > 1 ? 's' : ''}'
-        : '$yr an${yr > 1 ? 's' : ''} $mo mois';
+        ? '$yr year${yr > 1 ? 's' : ''}'
+        : '$yr year${yr > 1 ? 's' : ''} $mo months';
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    // Garde-fou : session non chargée
     if (!_session.isLoaded) {
       return Scaffold(
         backgroundColor: kDarkBg,
@@ -213,7 +204,6 @@ class _StatScreenState extends State<StatScreen>
     );
   }
 
-  // ─── TOP BAR ──────────────────────────────────────────────────────────────
   Widget _topBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
@@ -239,7 +229,7 @@ class _StatScreenState extends State<StatScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'STATISTIQUES',
+                  'STATISTICS',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -248,7 +238,7 @@ class _StatScreenState extends State<StatScreen>
                   ),
                 ),
                 Text(
-                  _session.name, // ← depuis la session
+                  _session.name,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.38),
                     fontSize: 11,
@@ -264,7 +254,6 @@ class _StatScreenState extends State<StatScreen>
     );
   }
 
-  // ─── PROFILE CARD ─────────────────────────────────────────────────────────
   Widget _profileCard() {
     return Container(
       height: 90,
@@ -279,9 +268,9 @@ class _StatScreenState extends State<StatScreen>
         children: [
           _session.image.isNotEmpty
               ? Image.network(
-                  _session.image, // ← depuis la session
+                  _session.image,
                   fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
+                  alignment: Alignment.center,
                   errorBuilder: (_, __, ___) => Container(
                     color: const Color(0xFF1A1A1A),
                     child: const Icon(Icons.person,
@@ -305,7 +294,7 @@ class _StatScreenState extends State<StatScreen>
               gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-                colors: [Colors.transparent, kDarkCard.withOpacity(0.97)],
+                colors: [kDarkCard.withOpacity(0.57), kDarkCard.withOpacity(0.97)],
                 stops: const [0.2, 0.6],
               ),
             ),
@@ -320,19 +309,17 @@ class _StatScreenState extends State<StatScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _chip('CLIENT', kNeonGreen),
                       const SizedBox(height: 5),
                       Text(
-                        _session.name, // ← depuis la session
+                        _session.name,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 3),
                       Text(
-                        '$_age ans · ${_session.height.toStringAsFixed(0)} cm · ${_session.goal}',
+                        '$_age yo · ${_session.height.toStringAsFixed(0)} cm · ${_session.goal}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -351,14 +338,13 @@ class _StatScreenState extends State<StatScreen>
     );
   }
 
-  // ─── MINI STATS ROW ───────────────────────────────────────────────────────
   Widget _miniStatsRow() {
     return Row(
       children: [
         Expanded(
           child: _miniStat(
             Icons.monitor_weight_outlined,
-            'POIDS',
+            'WEIGHT',
             _current.toStringAsFixed(1),
             'kg',
             kNeonGreen,
@@ -368,7 +354,7 @@ class _StatScreenState extends State<StatScreen>
         Expanded(
           child: _miniStat(
             Icons.flag_outlined,
-            'OBJECTIF',
+            'GOAL',
             _goal.toStringAsFixed(1),
             'kg',
             const Color(0xFF5BC4F5),
@@ -378,7 +364,7 @@ class _StatScreenState extends State<StatScreen>
         Expanded(
           child: _miniStat(
             Icons.analytics_outlined,
-            'IMC',
+            'BMI',
             _bmi.toStringAsFixed(1),
             '',
             _bmiColor,
@@ -388,9 +374,9 @@ class _StatScreenState extends State<StatScreen>
         Expanded(
           child: _miniStat(
             Icons.fitness_center_rounded,
-            'SÉANCES',
+            'SESSIONS',
             '${_session.frequency}x',
-            '/sem',
+            '/week',
             const Color(0xFFFFA940),
           ),
         ),
@@ -455,15 +441,14 @@ class _StatScreenState extends State<StatScreen>
     );
   }
 
-  // ─── PROGRESS CARD ────────────────────────────────────────────────────────
   Widget _progressCard() {
-    final isLoss     = _goal < _start;
+    final isLoss = _goal < _start;
     final goingRight =
         (isLoss && _change <= 0) || (!isLoss && _change >= 0);
     final changeColor =
         goingRight ? kNeonGreen : const Color(0xFFFF6B6B);
 
-    if (_loadingHistory) return _loadingCard('Calcul de la progression…');
+    if (_loadingHistory) return _loadingCard('Calculating progress...');
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -481,7 +466,7 @@ class _StatScreenState extends State<StatScreen>
                   color: kNeonGreen, size: 14),
               const SizedBox(width: 6),
               Text(
-                'PROGRESSION',
+                'PROGRESS',
                 style: TextStyle(
                   color: kNeonGreen.withOpacity(0.9),
                   fontSize: 10,
@@ -511,7 +496,7 @@ class _StatScreenState extends State<StatScreen>
                         ),
                       ),
                       Text(
-                        '${_remaining.toStringAsFixed(1)} kg restants',
+                        '${_remaining.toStringAsFixed(1)} kg remaining',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.38),
                           fontSize: 12,
@@ -538,15 +523,15 @@ class _StatScreenState extends State<StatScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _weightNode('DÉPART', '${_start.toStringAsFixed(1)} kg',
+              _weightNode('START', '${_start.toStringAsFixed(1)} kg',
                   Colors.white.withOpacity(0.4)),
               Icon(Icons.chevron_right,
                   color: Colors.white.withOpacity(0.2), size: 18),
-              _weightNode('ACTUEL', '${_current.toStringAsFixed(1)} kg',
+              _weightNode('CURRENT', '${_current.toStringAsFixed(1)} kg',
                   kNeonGreen),
               Icon(Icons.chevron_right,
                   color: Colors.white.withOpacity(0.2), size: 18),
-              _weightNode('OBJECTIF', '${_goal.toStringAsFixed(1)} kg',
+              _weightNode('GOAL', '${_goal.toStringAsFixed(1)} kg',
                   const Color(0xFF5BC4F5)),
             ],
           ),
@@ -561,7 +546,7 @@ class _StatScreenState extends State<StatScreen>
                       ? Icons.trending_down_rounded
                       : Icons.trending_up_rounded,
                   changeColor,
-                  'Changement total',
+                  'Total change',
                   '${_change > 0 ? '+' : ''}${_change.toStringAsFixed(1)} kg',
                 ),
               ),
@@ -573,7 +558,7 @@ class _StatScreenState extends State<StatScreen>
                 child: _infoRow(
                   Icons.access_time_rounded,
                   const Color(0xFFFFA940),
-                  'Temps estimé',
+                  'Estimated time',
                   _eta,
                 ),
               ),
@@ -625,7 +610,6 @@ class _StatScreenState extends State<StatScreen>
     );
   }
 
-  // ─── CHART CARD ───────────────────────────────────────────────────────────
   Widget _chartCard() {
     return Container(
       padding: const EdgeInsets.all(18),
@@ -643,7 +627,7 @@ class _StatScreenState extends State<StatScreen>
                   color: kNeonGreen, size: 14),
               const SizedBox(width: 6),
               Text(
-                'ÉVOLUTION DU POIDS',
+                'WEIGHT EVOLUTION',
                 style: TextStyle(
                   color: kNeonGreen.withOpacity(0.9),
                   fontSize: 10,
@@ -652,7 +636,7 @@ class _StatScreenState extends State<StatScreen>
                 ),
               ),
               const Spacer(),
-              Text('par mois · kg',
+              Text('per month · kg',
                   style: TextStyle(
                       color: Colors.white.withOpacity(0.25), fontSize: 10)),
             ],
@@ -669,7 +653,7 @@ class _StatScreenState extends State<StatScreen>
                     : _history.length < 2
                         ? Center(
                             child: Text(
-                              'Pas assez de données',
+                              'Not enough data',
                               style: TextStyle(
                                   color: Colors.white.withOpacity(0.2),
                                   fontSize: 13),
@@ -686,9 +670,9 @@ class _StatScreenState extends State<StatScreen>
           const SizedBox(height: 14),
           Row(
             children: [
-              _legend(kNeonGreen, 'Poids réel'),
+              _legend(kNeonGreen, 'Actual weight'),
               const SizedBox(width: 18),
-              _legend(const Color(0xFF5BC4F5), 'Objectif', dashed: true),
+              _legend(const Color(0xFF5BC4F5), 'Goal', dashed: true),
             ],
           ),
         ],
@@ -706,7 +690,7 @@ class _StatScreenState extends State<StatScreen>
           const SizedBox(height: 8),
           GestureDetector(
             onTap: _fetchWeightHistory,
-            child: Text('Réessayer',
+            child: Text('Retry',
                 style: TextStyle(
                     color: kNeonGreen.withOpacity(0.6),
                     fontSize: 12,
@@ -735,7 +719,6 @@ class _StatScreenState extends State<StatScreen>
     );
   }
 
-  // ─── GOAL BANNER ──────────────────────────────────────────────────────────
   Widget _goalBanner() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -763,7 +746,7 @@ class _StatScreenState extends State<StatScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _session.goal, // ← depuis la session
+                  _session.goal,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -772,7 +755,7 @@ class _StatScreenState extends State<StatScreen>
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'Estimé dans $_eta',
+                  'Estimated in $_eta',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.38),
                     fontSize: 11,
@@ -809,7 +792,6 @@ class _StatScreenState extends State<StatScreen>
     );
   }
 
-  // ─── Shared ───────────────────────────────────────────────────────────────
   Widget _chip(String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
@@ -856,7 +838,7 @@ class _StatScreenState extends State<StatScreen>
   }
 }
 
-// ─── Dash line painter ────────────────────────────────────────────────────────
+
 class _DashLine extends CustomPainter {
   final Color color;
   const _DashLine({required this.color});
@@ -881,7 +863,7 @@ class _DashLine extends CustomPainter {
   bool shouldRepaint(_) => false;
 }
 
-// ─── Chart painter ────────────────────────────────────────────────────────────
+
 class _ChartPainter extends CustomPainter {
   final List<WeightEntry> history;
   final double goalWeight;
@@ -969,8 +951,8 @@ class _ChartPainter extends CustomPainter {
     }
 
     const abbr = [
-      'Jan','Fév','Mar','Avr','Mai','Jui',
-      'Jul','Aoû','Sep','Oct','Nov','Déc'
+      'Jan','Feb','Mar','Apr','May','Jun',
+      'Jul','Aug','Sep','Oct','Nov','Dec'
     ];
     final step =
         ((history.length - 1) / 3).ceil().clamp(1, history.length);

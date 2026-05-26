@@ -4,6 +4,7 @@ import pool from "../../config/db.js";
 const router = express.Router();
 
 router.get("/run", async (req, res) => {
+  pool.execute('SELECT * FROM Clients LIMIT 1');
   res.send("the app is up :D");
 });
 

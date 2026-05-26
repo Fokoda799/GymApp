@@ -2,30 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/models/message.dart';
+import 'package:test_hh/models/chatSession.dart';
 import 'package:test_hh/screens/voice.dart';
-import 'package:test_hh/services/chatapi_service.dart';
-
-class ChatSession {
-  final int coachId;
-  final String coachName;
-  final String coachInitials;
-  final int clientId;
-  final String? clientImage;
-  final String? clientName;
-  final String clientInitials;
-  final String role; // 'client' | 'coach'
-
-  const ChatSession({
-    required this.coachId,
-    required this.coachName,
-    required this.coachInitials,
-    required this.clientId,
-    required this.clientImage,
-    required this.role,
-    this.clientName = 'Client',
-    this.clientInitials = 'C',
-  });
-}
+import 'package:test_hh/services/chatApiService.dart';
 
 class ChatScreen extends StatefulWidget {
   final ChatSession session;
@@ -64,10 +43,6 @@ class _ChatScreenState extends State<ChatScreen> {
     _pollTimer?.cancel();
     super.dispose();
   }
-
-  // ─────────────────────────────────────────────
-  // MESSAGES
-  // ─────────────────────────────────────────────
 
   Future<void> _loadMessages() async {
     setState(() {
@@ -156,10 +131,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // ─────────────────────────────────────────────
-  // HELPERS
-  // ─────────────────────────────────────────────
-
   ChatMessage _fromJson(Map<String, dynamic> json) {
     final isUser = json['isUser'] == 1;
     final rawTime = json['time'] ?? json['timestamp'];
@@ -212,10 +183,6 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
-
-  // ─────────────────────────────────────────────
-  // BUILD
-  // ─────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -466,10 +433,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // ─────────────────────────────────────────────
-  // INPUT BAR
-  // ─────────────────────────────────────────────
-
   Widget _buildInputBar() {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
@@ -540,11 +503,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
-
-  // ─────────────────────────────────────────────
-  // STATUS ICON
-  // ─────────────────────────────────────────────
-
+  
   Widget _statusIcon(MessageStatus status) {
     switch (status) {
       case MessageStatus.sending:

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/constants/colors.dart';
-import 'exercice.dart'; // NoteModel + ExerciceModel définis ici
+import 'exercice.dart';
 
 class TutorialScreen extends StatefulWidget {
   final ExerciceModel exercice;

@@ -6,11 +6,10 @@ import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/urls.dart';
 import 'package:test_hh/models/food.dart';
 import 'package:test_hh/models/recipe.dart';
-import 'package:test_hh/session/user_session.dart'; // ← NEW
+import 'package:test_hh/session/user_session.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-// ─── Screen ────────────────────────────────────────────────────────────────────
 
 class FoodsScreen extends StatefulWidget {
   const FoodsScreen({super.key});
@@ -19,25 +18,21 @@ class FoodsScreen extends StatefulWidget {
   State<FoodsScreen> createState() => _FoodsScreenState();
 }
 
-class _FoodsScreenState extends State<FoodsScreen>
-    with SingleTickerProviderStateMixin {
+class _FoodsScreenState extends State<FoodsScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // Cart: id -> quantity
   final Map<String, int> _cart = {};
 
-  // Data from API
   List<FoodModel>   _allFoods     = [];
-  List<FoodModel>   _recentFoods  = [];
+  // List<FoodModel>   _recentFoods  = [];
   List<RecipeModel> _recipes      = [];
   bool _isLoadingFoods    = true;
   bool _isLoadingRecipes  = true;
   bool _hasErrorFoods     = false;
   bool _hasErrorRecipes   = false;
 
-  // ID du client connecté — récupéré depuis UserSession
   int get _clientID => UserSession.instance.id;
 
   int get _cartTotal => _cart.values.fold(0, (a, b) => a + b);
@@ -66,18 +61,16 @@ class _FoodsScreenState extends State<FoodsScreen>
     super.dispose();
   }
 
-  /// Charge la session si besoin, puis lance les fetches.
   Future<void> _ensureSessionThenFetch() async {
     if (!UserSession.instance.isLoaded) {
       await UserSession.instance.load();
       if (!mounted) return;
-      setState(() {}); // rebuild pour avoir _clientID correct
+      setState(() {});
     }
     _fetchFoods();
     _fetchRecipes();
   }
 
-  // ─── API Calls ────────────────────────────────────────────────────────────────
 
   Future<void> _fetchFoods() async {
     setState(() {
@@ -96,7 +89,7 @@ class _FoodsScreenState extends State<FoodsScreen>
             _allFoods    = foodsData
                 .map((food) => FoodModel.fromJson(food))
                 .toList();
-            _recentFoods = _allFoods.take(6).toList();
+            // _recentFoods = _allFoods.take(6).toList();
           });
         } else {
           setState(() => _hasErrorFoods = true);
@@ -117,7 +110,6 @@ class _FoodsScreenState extends State<FoodsScreen>
       _hasErrorRecipes  = false;
     });
     try {
-      // On utilise _clientID depuis UserSession (plus de valeur en dur)
       final response = await http.get(
         Uri.parse('$kBaseUrl/api/pahae/addFood/recipes/$_clientID'),
       );
@@ -143,7 +135,6 @@ class _FoodsScreenState extends State<FoodsScreen>
     }
   }
 
-  // ─── Filtered Lists ──────────────────────────────────────────────────────────
 
   List<FoodModel> get _filteredFoods => _allFoods
       .where((f) => f.name.toLowerCase().contains(_searchQuery))
@@ -153,7 +144,6 @@ class _FoodsScreenState extends State<FoodsScreen>
       .where((r) => r.name.toLowerCase().contains(_searchQuery))
       .toList();
 
-  // ─── Build Methods ───────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +181,6 @@ class _FoodsScreenState extends State<FoodsScreen>
     );
   }
 
-  // ─── TOP BAR ────────────────────────────────────────────────────────────────
   Widget _buildTopBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
@@ -226,7 +215,6 @@ class _FoodsScreenState extends State<FoodsScreen>
                     letterSpacing: 2,
                   ),
                 ),
-                // Affiche le nom du user connecté sous le titre
                 if (UserSession.instance.isLoaded &&
                     UserSession.instance.name.isNotEmpty)
                   Text(
@@ -239,7 +227,6 @@ class _FoodsScreenState extends State<FoodsScreen>
               ],
             ),
           ),
-          // Live cart badge
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
             child: _cartTotal > 0
@@ -274,7 +261,6 @@ class _FoodsScreenState extends State<FoodsScreen>
     );
   }
 
-  // ─── SEARCH BAR ─────────────────────────────────────────────────────────────
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
@@ -308,7 +294,6 @@ class _FoodsScreenState extends State<FoodsScreen>
     );
   }
 
-  // ─── TAB BAR ────────────────────────────────────────────────────────────────
   Widget _buildTabBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
@@ -347,7 +332,6 @@ class _FoodsScreenState extends State<FoodsScreen>
     );
   }
 
-  // ─── FOODS TAB ───────────────────────────────────────────────────────────────
   Widget _buildFoodList() {
     final foods = _filteredFoods;
     if (foods.isEmpty) return _buildEmpty();
@@ -361,7 +345,6 @@ class _FoodsScreenState extends State<FoodsScreen>
     );
   }
 
-  // ─── RECIPES TAB ─────────────────────────────────────────────────────────────
   Widget _buildRecipeList() {
     final recipes = _filteredRecipes;
     return ListView(
@@ -412,13 +395,12 @@ class _FoodsScreenState extends State<FoodsScreen>
     );
   }
 
-  // ─── Food Card ───────────────────────────────────────────────────────────────
   Widget _buildFoodCard(FoodModel food) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          _cart[food.id] = (_cart[food.id] ?? 0) + 1;
-        });
+        // setState(() {
+        //   _cart[food.id] = (_cart[food.id] ?? 0) + 1;
+        // });
       },
       child: Container(
         decoration: BoxDecoration(
@@ -489,7 +471,6 @@ class _FoodsScreenState extends State<FoodsScreen>
     );
   }
 
-  // ─── Recipe Card ─────────────────────────────────────────────────────────────
   Widget _buildRecipeCard(RecipeModel recipe) {
     return Container(
       decoration: BoxDecoration(
@@ -669,7 +650,6 @@ class _FoodsScreenState extends State<FoodsScreen>
     );
   }
 
-  // ─── Shared Widgets ──────────────────────────────────────────────────────────
   Widget _buildTypeChip(String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
@@ -761,7 +741,7 @@ class _FoodsScreenState extends State<FoodsScreen>
       padding: const EdgeInsets.only(bottom: 8),
       child: GestureDetector(
         onTap: () {
-          // Confirm and add to meal
+          // slm hh
         },
         child: Container(
           padding: const EdgeInsets.symmetric(

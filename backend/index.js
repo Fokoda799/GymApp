@@ -13,6 +13,7 @@ import homeRoutes from './routes/pahae/home.js';
 import addFoodRoutes from './routes/pahae/addFood.js';
 import addRecipeRoutes from './routes/pahae/addRecipe.js';
 import clientsRoutes from './routes/pahae/clients.js';
+import AIRoutes from './routes/pahae/ai.js';
 import runnerRoutes from './routes/pahae/runner.js';
 
 import authRoutes from './routes/jihane/auth.js';
@@ -33,6 +34,7 @@ app.use('/api/pahae/home/', homeRoutes);
 app.use('/api/pahae/addFood/', addFoodRoutes);
 app.use('/api/pahae/addRecipe/', addRecipeRoutes);
 app.use('/api/pahae/clients/', clientsRoutes);
+app.use('/api/pahae/ai/', AIRoutes);
 app.use('/api/pahae/runner/', runnerRoutes);
 
 app.use("/api/client", clientRoute);

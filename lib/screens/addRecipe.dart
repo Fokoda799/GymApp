@@ -7,12 +7,8 @@ import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/urls.dart';
 import 'package:test_hh/models/food.dart';
 import 'package:test_hh/models/recipeIngredient.dart';
-import 'package:test_hh/services/api_service.dart';
-import 'package:test_hh/session/user_session.dart'; // ← ajout
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Screen
-// ─────────────────────────────────────────────────────────────────────────────
+import 'package:test_hh/services/apiService.dart';
+import 'package:test_hh/session/user_session.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -22,29 +18,22 @@ class AddRecipeScreen extends StatefulWidget {
 }
 
 class _AddRecipeScreenState extends State<AddRecipeScreen> {
-  // ── Session ─────────────────────────────────────────────────────────────────
-  // Lecture directe depuis UserSession — plus de Future/loading pour la session.
   int get _clientID => UserSession.instance.id;
 
-  // ── Form state ──────────────────────────────────────────────────────────────
   final _nameController = TextEditingController();
   XFile? _pickedImage;
 
-  // ── Ingredient state ────────────────────────────────────────────────────────
   List<FoodModel> _catalogue = [];
   bool _loadingCatalogue = true;
   String? _catalogueError;
 
   final List<RecipeIngredientModel> _entries = [];
 
-  // ── Search ──────────────────────────────────────────────────────────────────
   final _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // ── Save state ──────────────────────────────────────────────────────────────
   bool _saving = false;
 
-  // ── Derived ─────────────────────────────────────────────────────────────────
   double get _totalCalories =>
       _entries.fold(0.0, (s, e) => s + e.contributedCalories);
 
@@ -59,7 +48,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       .where((f) => f.name.toLowerCase().contains(_searchQuery))
       .toList();
 
-  // ── Lifecycle ───────────────────────────────────────────────────────────────
 
   @override
   void initState() {
@@ -69,8 +57,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       () => setState(
           () => _searchQuery = _searchController.text.toLowerCase()),
     );
-    // Plus besoin de charger la session : on la lit directement.
-    // On vérifie uniquement que la session est valide avant de fetch.
     if (UserSession.instance.isLoaded && UserSession.instance.isClient) {
       _fetchIngredients();
     }
@@ -83,8 +69,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     super.dispose();
   }
 
-  // ── Headers avec token ────────────────────────────────────────────────────────
-
   Future<Map<String, String>> _headers() async {
     final token = await ApiService.getToken();
     return {
@@ -92,8 +76,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       if (token != null) 'Authorization': 'Bearer $token',
     };
   }
-
-  // ── API calls ────────────────────────────────────────────────────────────────
 
   Future<void> _fetchIngredients() async {
     setState(() {
@@ -175,7 +157,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
       final headers = await _headers();
       final body = jsonEncode({
-        'clientID': _clientID, // ← lu depuis UserSession
+        'clientID': _clientID,
         'name': _nameController.text.trim(),
         'image': imageUrl,
         'calories': _totalCalories.toInt(),
@@ -220,8 +202,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     );
   }
 
-  // ── Ingredient helpers ───────────────────────────────────────────────────────
-
   bool _isAdded(FoodModel f) => _entries.any((e) => e.food.id == f.id);
 
   void _toggleFood(FoodModel f) {
@@ -245,13 +225,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     if (xfile != null) setState(() => _pickedImage = xfile);
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // Build
-  // ─────────────────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
-    // ── Vérification de session (synchrone) ────────────────────────────────
     if (!UserSession.instance.isLoaded || !UserSession.instance.isClient) {
       return Scaffold(
         backgroundColor: kDarkBg,
@@ -325,8 +300,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     );
   }
 
-  // ── TOP BAR ──────────────────────────────────────────────────────────────────
-
   Widget _buildTopBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
@@ -382,8 +355,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       ),
     );
   }
-
-  // ── IMAGE + NAME ─────────────────────────────────────────────────────────────
 
   Widget _buildImageAndNameSection() {
     return Padding(
@@ -508,8 +479,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       ),
     );
   }
-
-  // ── LIVE RECIPE SUMMARY ───────────────────────────────────────────────────────
 
   Widget _buildLiveRecipeSummary() {
     if (_entries.isEmpty) return const SizedBox.shrink();
@@ -760,8 +729,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     );
   }
 
-  // ── INGREDIENT PICKER ────────────────────────────────────────────────────────
-
   Widget _buildIngredientPickerSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -988,9 +955,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       ),
     );
   }
-
-  // ── SAVE FAB ─────────────────────────────────────────────────────────────────
-
+  
   Widget _buildSaveFAB() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1035,8 +1000,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       ),
     );
   }
-
-  // ── Shared helpers ────────────────────────────────────────────────────────────
 
   Widget _buildTypeChip(String label, {bool highlighted = false}) {
     return Container(

@@ -2,7 +2,7 @@ import 'package:test_hh/models/food.dart';
 
 class RecipeIngredientModel {
   final FoodModel food;
-  double quantity; // grams / ml / units depending on type
+  double quantity;
 
   RecipeIngredientModel({required this.food, this.quantity = 100});
 

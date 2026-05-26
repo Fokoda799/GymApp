@@ -3,14 +3,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/models/food.dart';
 import 'package:test_hh/models/exercice.dart';
 import 'package:test_hh/models/bodyPart.dart';
-import 'package:test_hh/models/notes.dart';
 import 'package:test_hh/models/dayProgram.dart';
 import 'package:test_hh/constants/urls.dart';
-import 'package:test_hh/session/user_session.dart'; // ← UserSession
+import 'package:test_hh/session/user_session.dart';
 
 class ProgramScreen extends StatefulWidget {
   const ProgramScreen({super.key});
@@ -20,32 +18,37 @@ class ProgramScreen extends StatefulWidget {
 }
 
 class _ProgramScreenState extends State<ProgramScreen> {
-  // ── Session ──────────────────────────────────────────────────────────────
   final _session = UserSession.instance;
 
   late Future<List<DayProgram>> _programFuture;
   late int _selectedDayIndex;
   static const _daysShort = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-  static const _daysFull  = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  static const _daysFull = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
 
-  /// ID du client connecté, lu depuis la session
   int get _clientId => _session.id;
 
   @override
- @override
-void initState() {
-  super.initState();
-  _selectedDayIndex = (DateTime.now().weekday - 1).clamp(0, 6);
-  _ensureSessionThenLoad();
-}
-
-Future<void> _ensureSessionThenLoad() async {
-  if (!_session.isLoaded || _session.id == 0) {
-    await _session.load();
+  void initState() {
+    super.initState();
+    _selectedDayIndex = (DateTime.now().weekday - 1).clamp(0, 6);
+    _ensureSessionThenLoad();
   }
-  print('=== ProgramScreen clientId: $_clientId ===');
-  _loadProgram();
-}
+
+  Future<void> _ensureSessionThenLoad() async {
+    if (!_session.isLoaded || _session.id == 0) {
+      await _session.load();
+    }
+    print('=== ProgramScreen clientId: $_clientId ===');
+    _loadProgram();
+  }
 
   Future<void> _loadProgram() {
     setState(() {
@@ -137,14 +140,11 @@ Future<void> _ensureSessionThenLoad() async {
 
   @override
   Widget build(BuildContext context) {
-    // Garde-fou session
     if (!_session.isLoaded) {
       return Scaffold(
         backgroundColor: kDarkBg,
         appBar: const Header(),
-        body: const Center(
-          child: CircularProgressIndicator(color: kNeonGreen),
-        ),
+        body: const Center(child: CircularProgressIndicator(color: kNeonGreen)),
       );
     }
 
@@ -156,7 +156,8 @@ Future<void> _ensureSessionThenLoad() async {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-                child: CircularProgressIndicator(color: kNeonGreen));
+              child: CircularProgressIndicator(color: kNeonGreen),
+            );
           }
 
           if (snapshot.hasError ||
@@ -165,7 +166,7 @@ Future<void> _ensureSessionThenLoad() async {
             return _buildErrorState();
           }
 
-          final week  = snapshot.data!;
+          final week = snapshot.data!;
           final today = week[_selectedDayIndex];
 
           return Column(
@@ -179,29 +180,33 @@ Future<void> _ensureSessionThenLoad() async {
                     const Text(
                       'MY PROGRAM',
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.5),
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.5,
+                      ),
                     ),
                     const Spacer(),
-                    // Fréquence d'entraînement du client connecté
                     if (_session.frequency > 0)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: kNeonGreen.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                              color: kNeonGreen.withOpacity(0.3)),
+                            color: kNeonGreen.withOpacity(0.3),
+                          ),
                         ),
                         child: Text(
                           '${_session.frequency}x / week',
                           style: const TextStyle(
-                              color: kNeonGreen,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700),
+                            color: kNeonGreen,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                   ],
@@ -253,7 +258,9 @@ Future<void> _ensureSessionThenLoad() async {
                           child: Text(
                             "Aucun exercice prévu pour aujourd'hui.",
                             style: TextStyle(
-                                color: Colors.white38, fontSize: 14),
+                              color: Colors.white38,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                     ],
@@ -281,8 +288,7 @@ Future<void> _ensureSessionThenLoad() async {
         ElevatedButton(
           onPressed: _loadProgram,
           style: ElevatedButton.styleFrom(backgroundColor: kNeonGreen),
-          child:
-              const Text("Réessayer", style: TextStyle(color: Colors.black)),
+          child: const Text("Réessayer", style: TextStyle(color: Colors.black)),
         ),
       ],
     );
@@ -298,8 +304,8 @@ Future<void> _ensureSessionThenLoad() async {
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final isSelected = _selectedDayIndex == index;
-          final isToday    = DateTime.now().weekday - 1 == index;
-          final dayData    = week.length > index
+          final isToday = DateTime.now().weekday - 1 == index;
+          final dayData = week.length > index
               ? week[index]
               : DayProgram(
                   day: _daysFull[index],
@@ -308,7 +314,8 @@ Future<void> _ensureSessionThenLoad() async {
                   dinnerFoods: [],
                   exercises: [],
                 );
-          final hasData = dayData.breakfastFoods.isNotEmpty ||
+          final hasData =
+              dayData.breakfastFoods.isNotEmpty ||
               dayData.lunchFoods.isNotEmpty ||
               dayData.dinnerFoods.isNotEmpty ||
               dayData.exercises.isNotEmpty;
@@ -319,16 +326,14 @@ Future<void> _ensureSessionThenLoad() async {
               duration: const Duration(milliseconds: 200),
               width: 52,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? kNeonGreen.withOpacity(0.15)
-                    : kDarkCard,
+                color: isSelected ? kNeonGreen.withOpacity(0.15) : kDarkCard,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isSelected
                       ? kNeonGreen
                       : hasData
-                          ? Colors.white24
-                          : Colors.white10,
+                      ? Colors.white24
+                      : Colors.white10,
                   width: isSelected ? 1.5 : 1,
                 ),
               ),
@@ -341,8 +346,8 @@ Future<void> _ensureSessionThenLoad() async {
                       color: isSelected
                           ? kNeonGreen
                           : hasData
-                              ? Colors.white
-                              : Colors.white38,
+                          ? Colors.white
+                          : Colors.white38,
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
@@ -370,9 +375,9 @@ Future<void> _ensureSessionThenLoad() async {
 
   Widget _buildCalorieSummary(DayProgram day) {
     final breakfast = day.breakfastFoods.fold(0.0, (s, f) => s + f.calories);
-    final lunch     = day.lunchFoods.fold(0.0, (s, f) => s + f.calories);
-    final dinner    = day.dinnerFoods.fold(0.0, (s, f) => s + f.calories);
-    final total     = breakfast + lunch + dinner;
+    final lunch = day.lunchFoods.fold(0.0, (s, f) => s + f.calories);
+    final dinner = day.dinnerFoods.fold(0.0, (s, f) => s + f.calories);
+    final total = breakfast + lunch + dinner;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -381,7 +386,7 @@ Future<void> _ensureSessionThenLoad() async {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: kNeonGreen.withOpacity(0.2)),
         boxShadow: [
-          BoxShadow(color: kNeonGreen.withOpacity(0.05), blurRadius: 16)
+          BoxShadow(color: kNeonGreen.withOpacity(0.05), blurRadius: 16),
         ],
       ),
       child: Column(
@@ -395,8 +400,11 @@ Future<void> _ensureSessionThenLoad() async {
                   color: kNeonGreen.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.local_fire_department,
-                    color: kNeonGreen, size: 20),
+                child: const Icon(
+                  Icons.local_fire_department,
+                  color: kNeonGreen,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               Column(
@@ -431,26 +439,34 @@ Future<void> _ensureSessionThenLoad() async {
           const SizedBox(height: 14),
           Row(
             children: [
-              _mealCalChip('🌅', 'Breakfast', breakfast, const Color(0xFFF59E0B)),
+              _mealCalChip(
+                '🌅',
+                'Breakfast',
+                breakfast,
+                const Color(0xFFF59E0B),
+              ),
               const SizedBox(width: 8),
               _mealCalChip('☁️', 'Lunch', lunch, const Color(0xFF3B82F6)),
               const SizedBox(width: 8),
               _mealCalChip('🌙', 'Dinner', dinner, const Color(0xFF8B5CF6)),
             ],
           ),
-          // Objectif calorique personnel (basé sur le poids objectif du client)
           if (_session.weightGoal > 0) ...[
             const SizedBox(height: 10),
             Row(
               children: [
-                Icon(Icons.flag_outlined,
-                    color: Colors.white.withOpacity(0.35), size: 12),
+                Icon(
+                  Icons.flag_outlined,
+                  color: Colors.white.withOpacity(0.35),
+                  size: 12,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   'Goal: ${_session.goal}  •  Target: ${_session.weightGoal.toStringAsFixed(1)} kg',
                   style: TextStyle(
-                      color: Colors.white.withOpacity(0.35),
-                      fontSize: 11),
+                    color: Colors.white.withOpacity(0.35),
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),
@@ -460,8 +476,7 @@ Future<void> _ensureSessionThenLoad() async {
     );
   }
 
-  Widget _mealCalChip(
-      String emoji, String label, double cal, Color color) {
+  Widget _mealCalChip(String emoji, String label, double cal, Color color) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -500,7 +515,11 @@ Future<void> _ensureSessionThenLoad() async {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader(
-            icon: icon, title: title, count: foods.length, color: color),
+          icon: icon,
+          title: title,
+          count: foods.length,
+          color: color,
+        ),
         const SizedBox(height: 10),
         ...foods.map((f) => _buildFoodItem(f, color)),
       ],
@@ -587,7 +606,7 @@ Future<void> _ensureSessionThenLoad() async {
                           child: CircularProgressIndicator(
                             value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
+                                      loadingProgress.expectedTotalBytes!
                                 : null,
                             color: accentColor,
                           ),
@@ -667,16 +686,18 @@ Future<void> _ensureSessionThenLoad() async {
                     child: Image.network(
                       exercise.image,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.fitness_center,
-                              color: kNeonGreen, size: 20),
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.fitness_center,
+                        color: kNeonGreen,
+                        size: 20,
+                      ),
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Center(
                           child: CircularProgressIndicator(
                             value: loadingProgress.expectedTotalBytes != null
                                 ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
+                                      loadingProgress.expectedTotalBytes!
                                 : null,
                             color: kNeonGreen,
                           ),
@@ -684,8 +705,7 @@ Future<void> _ensureSessionThenLoad() async {
                       },
                     ),
                   )
-                : const Icon(Icons.fitness_center,
-                    color: kNeonGreen, size: 20),
+                : const Icon(Icons.fitness_center, color: kNeonGreen, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
