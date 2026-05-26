@@ -199,14 +199,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       children: [
         Container(
-          width: 48, height: 48,
-          decoration: BoxDecoration(
-            color: kNeonGreen.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: kNeonGreen.withOpacity(0.35), width: 1),
-            boxShadow: [BoxShadow(color: kNeonGreen.withOpacity(0.25), blurRadius: 20)],
-          ),
-          child: const Icon(Icons.fitness_center, color: kNeonGreen, size: 24),
+          width: 48,
+          height: 48,
+          child: Image.asset('assets/logo.png', fit: BoxFit.cover),
         ),
         const SizedBox(height: 8),
         Text(
@@ -311,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             )
           : const Text(
-              'CONNEXION →',
+              'LOGIN →',
               style: TextStyle(
                 fontSize: 18, fontWeight: FontWeight.w900,
                 letterSpacing: 2, color: kDarkBg,

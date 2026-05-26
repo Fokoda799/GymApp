@@ -53,6 +53,7 @@ build/
 # BACKEND
 backend/node_modules/
 backend/package-lock.json
+backend/.env
 
 # Flutter ephemeral
 **/Flutter/ephemeral/
@@ -60,3 +61,8 @@ backend/package-lock.json
 
 # Android
 android/local.properties
+
+# ADMIN
+admin/node_modules/
+admin/package-lock.json
+admin/.env
