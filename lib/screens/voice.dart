@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:universal_html/html.dart' as html;
-import 'dart:ui_web' as ui;
 
 import 'package:test_hh/constants/urls.dart';
 import 'package:test_hh/models/chatSession.dart';
+
+import '../stub/ui_web_stub.dart'
+if (dart.library.html) 'dart:ui_web' as ui;
 
 class VoiceScreen extends StatefulWidget {
   final ChatSession chatSession;
@@ -71,7 +73,15 @@ class _VoiceScreenState extends State<VoiceScreen> {
     } else {
       _controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..loadRequest(Uri.parse(_url));
+        ..setBackgroundColor(Colors.black)
+        ..setNavigationDelegate(NavigationDelegate(
+          onPageFinished: (url) => print("Page loaded: $url"),
+          onWebResourceError: (error) => print("WebView error: $error"),
+        ))
+        ..loadRequest(
+          Uri.parse(_url),
+          headers: {'Accept': '*/*'},
+        );
     }
   }
 

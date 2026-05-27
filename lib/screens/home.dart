@@ -7,6 +7,7 @@ import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/screens/addFood.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/urls.dart';
+import 'package:test_hh/screens/ai.dart';
 import 'package:test_hh/session/user_session.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -673,7 +674,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCircularProgress() {
-    final consumed = _summary?.totalConsumed ?? 0;
+    final consumed = ((_summary?.totalConsumed ?? 0) - (_summary?.totalBurned ?? 0))
+      .clamp(0, double.infinity)
+      .toInt();
     final goal = _summary?.calorieGoal ?? 2300;
     final progress = (consumed / goal).clamp(0.0, 1.0);
     final progressLabel = '${(progress * 100).toStringAsFixed(0)}%';
@@ -888,6 +891,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Icon(Icons.bolt, color: kNeonGreen, size: 20),
             ),
             const SizedBox(width: 12),
+
             Expanded(
               child: Text(
                 msg,
@@ -898,10 +902,48 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white.withOpacity(0.4),
-              size: 14,
+
+            // 🔥 bouton AI bien visible + label implicite
+            _buildAiButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAiButton() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AIScreen()),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: kNeonGreen.withOpacity(0.4),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.android,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 6),
+            const Text(
+              "Ask AI ?",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
