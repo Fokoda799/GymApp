@@ -5,8 +5,8 @@ import 'package:test_hh/screens/profileClient.dart';
 import 'package:test_hh/screens/profileCoach.dart';
 import 'package:test_hh/screens/chat.dart';
 import 'package:test_hh/screens/coachConv.dart';
-import 'package:test_hh/screens/ai.dart';
 import 'package:test_hh/models/chatSession.dart';
+import 'package:test_hh/screens/program.dart';
 import 'package:test_hh/services/apiService.dart';
 
 class Header extends StatefulWidget implements PreferredSizeWidget {
@@ -24,6 +24,7 @@ class _HeaderState extends State<Header> {
   String? _userImageUrl;
   bool _isLoadingImage = true;
   bool _showChatButton = false;
+  bool _showProgramButton = false;
   bool _isClient = false;
 
   @override
@@ -36,26 +37,38 @@ class _HeaderState extends State<Header> {
   Future<void> _checkChatAvailability() async {
     try {
       final role = await ApiService.getUserRole();
+
       if (role == 'coach') {
-        if (mounted) setState(() {
-          _showChatButton = true;
-          _isClient = false;
-        });
-      } else if (role == 'client') {
+        if (mounted) {
+          setState(() {
+            _showChatButton = true;
+            _showProgramButton = true;
+            _isClient = false;
+          });
+        }
+      } 
+      else if (role == 'client') {
         final data = await ApiService.getMe();
         if (data['success'] == true) {
           final user = data['user'] ?? data['client'];
           final coach = user?['coach'] as Map<String, dynamic>?;
+
           if (mounted) {
             setState(() {
               _showChatButton = coach != null && coach['id'] != null;
+              _showProgramButton = coach != null && coach['id'] != null;
               _isClient = true;
             });
           }
         }
       }
     } catch (e) {
-      if (mounted) setState(() => _showChatButton = false);
+      if (mounted) {
+        setState(() {
+          _showChatButton = false;
+          _showProgramButton = false;
+        });
+      }
     }
   }
 
@@ -106,6 +119,15 @@ class _HeaderState extends State<Header> {
     } finally {
       if (mounted) setState(() => _chatLoading = false);
     }
+  }
+
+  Future<void> _onProgramTap() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProgramScreen()
+      ),
+    );
   }
 
   Future<void> _navigateAsClient() async {
@@ -201,15 +223,13 @@ class _HeaderState extends State<Header> {
           children: [
             Row(
               children: [
-                if (_isClient) _buildAiButton(),
-                if (_isClient && _showChatButton) const SizedBox(width: 8),
-                if (_showChatButton)
-                  _buildChatButton()
+                if (_showProgramButton) _buildProgramButton(),
+                const SizedBox(width: 10),
+                if (_showChatButton) _buildChatButton()
                 else if (!_isClient)
                   const SizedBox(width: 42),
               ],
             ),
-
             RichText(
               text: TextSpan(
                 children: [
@@ -242,14 +262,9 @@ class _HeaderState extends State<Header> {
     );
   }
 
-  Widget _buildAiButton() {
+  Widget _buildProgramButton() {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const AIScreen()),
-        );
-      },
+      onTap: _onProgramTap,
       child: Container(
         width: 42,
         height: 42,
@@ -258,19 +273,10 @@ class _HeaderState extends State<Header> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white12, width: 1),
         ),
-        child: Center(
-          child: ShaderMask(
-            shaderCallback: (bounds) => const LinearGradient(
-              colors: [Color(0xFF9B59B6), kNeonGreen],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ).createShader(bounds),
-            child: const Icon(
-              Icons.android,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
+        child: const Icon(
+          Icons.calendar_month,
+          color: Colors.white,
+          size: 20,
         ),
       ),
     );
