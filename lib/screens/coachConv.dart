@@ -112,7 +112,7 @@ class _CoachConversationsScreenState extends State<CoachConversationsScreen> {
         backgroundColor: const Color(0xFF111111),
         foregroundColor: Colors.white,
         title: const Text(
-          'Mes conversations',
+          'My conversations',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
         bottom: PreferredSize(
