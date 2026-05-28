@@ -330,7 +330,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_messages.isEmpty) {
       return Center(
         child: Text(
-          'Aucun message. Envoyez le premier ! 👋',
+          'Not messages yet, send one first !',
           style: TextStyle(
             color: Colors.white.withOpacity(0.3),
             fontSize: 13,

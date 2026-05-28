@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:video_player/video_player.dart';
 import 'package:test_hh/components/header.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/screens/tutorial.dart';
@@ -92,11 +93,19 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
   ExerciceModel? _exercice;
   bool _loading = true;
   String? _error;
+  VideoPlayerController? _videoController;
+  bool _videoInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _fetchExercice();
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchExercice() async {
@@ -116,6 +125,16 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
         _exercice = ExerciceModel.fromJson(body['data']);
         _loading  = false;
       });
+
+      if (_exercice!.video.isNotEmpty) {
+        _videoController = VideoPlayerController.networkUrl(
+          Uri.parse(_exercice!.video),
+        )..initialize().then((_) {
+          setState(() => _videoInitialized = true);
+          _videoController!.setLooping(true);
+          _videoController!.play();
+        });
+      }
     } catch (e) {
       setState(() {
         _error   = e.toString();
@@ -203,7 +222,26 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
         SizedBox(
           height: 260,
           width: double.infinity,
-          child: Image.network(
+          child: ex.video.isNotEmpty && _videoInitialized && _videoController != null
+              ? GestureDetector(
+            onTap: () {
+              setState(() {
+                _videoController!.value.isPlaying
+                    ? _videoController!.pause()
+                    : _videoController!.play();
+              });
+            },
+            child: FittedBox(
+              fit: BoxFit.cover,
+              clipBehavior: Clip.hardEdge,
+              child: SizedBox(
+                width: _videoController!.value.size.width,
+                height: _videoController!.value.size.height,
+                child: VideoPlayer(_videoController!),
+              ),
+            ),
+          )
+              : Image.network(
             ex.image,
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => Container(
@@ -213,6 +251,7 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
             ),
           ),
         ),
+
         Positioned.fill(
           child: Container(
             decoration: const BoxDecoration(
@@ -225,6 +264,7 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
             ),
           ),
         ),
+
         Positioned(
           top: 0, left: 0, right: 0,
           child: Padding(
@@ -250,6 +290,22 @@ class _ExerciceScreenState extends State<ExerciceScreen> {
             ),
           ),
         ),
+
+        if (_videoInitialized && _videoController != null)
+          Positioned.fill(
+            child: Center(
+              child: ValueListenableBuilder(
+                valueListenable: _videoController!,
+                builder: (_, value, __) => AnimatedOpacity(
+                  opacity: value.isPlaying ? 0.0 : 1.0,
+                  duration: const Duration(milliseconds: 300),
+                  child: const Icon(Icons.play_circle_fill,
+                      color: Colors.white70, size: 52),
+                ),
+              ),
+            ),
+          ),
+
         Positioned(
           bottom: 16, left: 18, right: 18,
           child: Column(
