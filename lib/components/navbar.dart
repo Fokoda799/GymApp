@@ -1,47 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/colors.dart';
 
-import 'package:test_hh/screens/home.dart';
-import 'package:test_hh/screens/foods.dart';
-import 'package:test_hh/screens/bodyParts.dart';
-import 'package:test_hh/screens/stats.dart';
+class NavBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onTap;
 
-class NavBar extends StatefulWidget {
-  NavBar({ super.key, required this.selectedIndex });
-
-  int selectedIndex;
-
-  @override
-  State<NavBar> createState() => _NavBarState();
-}
-
-// test
-
-class _NavBarState extends State<NavBar> {
+  const NavBar({
+    super.key,
+    required this.selectedIndex,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final items = [
-      _NavItem(
-        icon: Icons.home,
-        label: 'Home',
-        href: HomeScreen()
-      ),
-      _NavItem(
-        icon: Icons.restaurant_menu,
-        label: 'Foods',
-        href: FoodsScreen(),
-      ),
-      _NavItem(
-        icon: Icons.fitness_center,
-        label: 'Exercises',
-        href: BodyPartsScreen(),
-      ),
-      _NavItem(
-        icon: Icons.bar_chart,
-        label: 'Stats',
-        href: StatScreen(),
-      ),
+      const _NavData(icon: Icons.home, label: 'Home'),
+      const _NavData(icon: Icons.restaurant_menu, label: 'Foods'),
+      const _NavData(icon: Icons.fitness_center, label: 'Exercises'),
+      const _NavData(icon: Icons.bar_chart, label: 'Stats'),
     ];
 
     return Container(
@@ -68,15 +44,10 @@ class _NavBarState extends State<NavBar> {
         children: items.asMap().entries.map((entry) {
           final index = entry.key;
           final item = entry.value;
-          final isActive = index == widget.selectedIndex;
+          final isActive = index == selectedIndex;
           return GestureDetector(
-            onTap: () => {
-              // setState(() => _selectedIndex = index),
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => item.href),
-              ),
-            },
+            onTap: () => onTap(index),
+            behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -113,9 +84,8 @@ class _NavBarState extends State<NavBar> {
   }
 }
 
-class _NavItem {
+class _NavData {
   final IconData icon;
   final String label;
-  final Widget href;
-  const _NavItem({required this.icon, required this.label, required this.href});
+  const _NavData({required this.icon, required this.label});
 }

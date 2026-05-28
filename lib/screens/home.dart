@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/screens/addFood.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/urls.dart';
@@ -573,7 +572,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: NavBar(selectedIndex: 0),
     );
   }
 

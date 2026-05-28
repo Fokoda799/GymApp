@@ -1,35 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:test_hh/constants/colors.dart';
-import 'package:test_hh/screens/clients.dart';
-import 'package:test_hh/screens/invites.dart';
 
-class NavBarCoach extends StatefulWidget {
-  NavBarCoach({ super.key, required this.selectedIndex });
+class NavBarCoach extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onTap;
 
-  int selectedIndex;
-
-  @override
-  State<NavBarCoach> createState() => _NavBarCoachState();
-}
-
-// test
-
-class _NavBarCoachState extends State<NavBarCoach> {
+  const NavBarCoach({
+    super.key,
+    required this.selectedIndex,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    print("slm hh");
     final items = [
-      _NavItem(
-        icon: Icons.people,
-        label: 'Clients',
-        href: ClientsScreen()
-      ),
-      _NavItem(
-        icon: Icons.person_add,
-        label: 'Invites',
-        href: InvitesPage(),
-      ),
+      const _NavData(icon: Icons.people, label: 'Clients'),
+      const _NavData(icon: Icons.person_add, label: 'Invites'),
     ];
 
     return Container(
@@ -56,15 +42,10 @@ class _NavBarCoachState extends State<NavBarCoach> {
         children: items.asMap().entries.map((entry) {
           final index = entry.key;
           final item = entry.value;
-          final isActive = index == widget.selectedIndex;
+          final isActive = index == selectedIndex;
           return GestureDetector(
-            onTap: () => {
-              // setState(() => _selectedIndex = index),
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => item.href),
-              ),
-            },
+            onTap: () => onTap(index),
+            behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -101,9 +82,8 @@ class _NavBarCoachState extends State<NavBarCoach> {
   }
 }
 
-class _NavItem {
+class _NavData {
   final IconData icon;
   final String label;
-  final Widget href;
-  const _NavItem({required this.icon, required this.label, required this.href});
+  const _NavData({required this.icon, required this.label});
 }

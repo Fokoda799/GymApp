@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:test_hh/components/navbarCoach.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/components/header.dart';
 import 'package:test_hh/session/user_session.dart';
@@ -278,7 +277,6 @@ class _InvitesPageState extends State<InvitesPage> {
                 color: Colors.white.withOpacity(0.5), fontSize: 14),
           ),
         ),
-        bottomNavigationBar: NavBarCoach(selectedIndex: 1),
       );
     }
 
@@ -414,7 +412,6 @@ class _InvitesPageState extends State<InvitesPage> {
           ),
         ],
       ),
-      bottomNavigationBar: NavBarCoach(selectedIndex: 1),
     );
   }
 
