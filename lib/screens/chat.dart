@@ -1,10 +1,36 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/models/message.dart';
 import 'package:test_hh/models/chatSession.dart';
 import 'package:test_hh/screens/voice.dart';
 import 'package:test_hh/services/chatApiService.dart';
+
+Future<void> startCall(BuildContext context, ChatSession session) async {
+  try {
+    final statuses = await [
+      Permission.camera,
+      Permission.microphone,
+    ].request();
+
+    final allGranted = statuses.values.every((s) => s.isGranted);
+
+    if (allGranted) {
+      Navigator.push(context, MaterialPageRoute(
+        builder: (_) => VoiceScreen(chatSession: session),
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Camera and microphone access required')),
+      );
+    }
+  } catch (e, stack) {
+    print("startCall error: $e");
+    print(stack);
+  }
+}
+
 
 class ChatScreen extends StatefulWidget {
   final ChatSession session;
@@ -243,13 +269,8 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             margin: EdgeInsets.only(right: 14),
             child: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => VoiceScreen(chatSession: _s)
-                  )
-                );
+              onPressed: () async {
+                await startCall(context, _s);
               },
               icon: Icon(
                 Icons.call,
