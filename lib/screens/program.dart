@@ -91,7 +91,7 @@ class _ProgramScreenState extends State<ProgramScreen> {
         id: food['id'].toString(),
         name: food['name'] ?? 'Unknown',
         imageUrl: food['imageUrl'] ?? '',
-        calories: food['calories'] ?? 0,
+        calories: (food['calories'] ?? 0).toDouble(),
         type: _parseFoodType(food['type']),
       );
     }).toList();
