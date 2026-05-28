@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:permission_handler/permission_handler.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 import 'package:test_hh/constants/urls.dart';
 import 'package:test_hh/models/chatSession.dart';
@@ -25,6 +27,10 @@ class _VoiceScreenState extends State<VoiceScreen> {
   @override
   void initState() {
     super.initState();
+
+    if (!kIsWeb) {
+      _requestPermissions();
+    }
 
     final s = widget.chatSession;
 
@@ -82,10 +88,25 @@ class _VoiceScreenState extends State<VoiceScreen> {
           Uri.parse(_url),
           headers: {'Accept': '*/*'},
         );
+
+      if (_controller!.platform is AndroidWebViewController) {
+        AndroidWebViewController.enableDebugging(true);
+        (_controller!.platform as AndroidWebViewController)
+            .setMediaPlaybackRequiresUserGesture(false);
+        (_controller!.platform as AndroidWebViewController).setOnPlatformPermissionRequest((request) {
+          request.grant();
+        });
+      }
     }
   }
 
-  @override
+  Future<void> _requestPermissions() async {
+    await [
+      Permission.camera,
+      Permission.microphone,
+    ].request();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
