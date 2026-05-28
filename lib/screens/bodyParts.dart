@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/screens/exercices.dart';
 import 'package:test_hh/services/apiService.dart';
@@ -126,7 +125,6 @@ class _BodyPartsScreenState extends State<BodyPartsScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: NavBar(selectedIndex: 2),
     );
   }
 

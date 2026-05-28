@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/urls.dart';
 import 'package:test_hh/session/user_session.dart';
@@ -200,7 +199,6 @@ class _StatScreenState extends State<StatScreen>
           ],
         ),
       ),
-      bottomNavigationBar: NavBar(selectedIndex: 3),
     );
   }
 

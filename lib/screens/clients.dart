@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbarCoach.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/urls.dart';
 import 'package:test_hh/screens/client.dart';
@@ -192,7 +191,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
       backgroundColor: Colors.black,
       appBar: const Header(),
       body: _buildBody(),
-      bottomNavigationBar: NavBarCoach(selectedIndex: 0),
     );
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:test_hh/components/header.dart';
-import 'package:test_hh/components/navbar.dart';
 import 'package:test_hh/screens/addRecipe.dart';
 import 'package:test_hh/constants/colors.dart';
 import 'package:test_hh/constants/urls.dart';
@@ -177,7 +176,6 @@ class _FoodsScreenState extends State<FoodsScreen> with SingleTickerProviderStat
         ),
       ),
       floatingActionButton: _cartTotal > 0 ? _buildCartFAB() : null,
-      bottomNavigationBar: NavBar(selectedIndex: 1),
     );
   }
 
