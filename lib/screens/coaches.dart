@@ -126,6 +126,29 @@ class _CoachesPageState extends State<CoachesPage> {
         children: [
           const SizedBox(height: 20),
 
+           // 
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
+          ),
+          child: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 14,
+          ),
+        ),
+      ),
+    ),
+    const SizedBox(height: 12),
+    //
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Row(
