@@ -42,7 +42,7 @@ class _HeaderState extends State<Header> {
         if (mounted) {
           setState(() {
             _showChatButton = true;
-            _showProgramButton = true;
+            _showProgramButton = false;
             _isClient = false;
           });
         }

@@ -674,9 +674,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCircularProgress() {
-    final consumed = ((_summary?.totalConsumed ?? 0) - (_summary?.totalBurned ?? 0))
-      .clamp(0, double.infinity)
-      .toInt();
+    final consumed = ((_summary?.totalConsumed ?? 0) - (_summary?.totalBurned ?? 0)) + (UserSession.instance.gender == 'Male' ? 2200 : 1800);
     final goal = _summary?.calorieGoal ?? 2300;
     final progress = (consumed / goal).clamp(0.0, 1.0);
     final progressLabel = '${(progress * 100).toStringAsFixed(0)}%';
@@ -1286,8 +1284,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildActivitiesSection() {
-    final totalBurned = _summary?.totalBurned ?? (_summary?.baseBurned ?? 2200);
-    final baseBurned = _summary?.baseBurned ?? 2200;
+    final totalBurned = _summary?.totalBurned ?? (_summary?.baseBurned ?? (UserSession.instance.gender == 'Male' ? 2200 : 1800));
+    final baseBurned = _summary?.baseBurned ?? (UserSession.instance.gender == 'Male' ? 2200 : 1800);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
